@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Form Checker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
+            font-family: inherit;
+            min-height: 100px;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+            width: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: #667eea;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .steps {
+            margin-top: 20px;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: stepAppear 0.5s ease forwards;
+        }
+        
+        @keyframes stepAppear {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .step-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .step-icon {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        
+        .result {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #667eea;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Typing effect cursor */
+        .typing::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏋️ Workout Form Checker</h1>
+            <p>AI-powered agent to analyze workout pain and form issues</p>
+        </div>
+        
+        <div class="card">
+            <h2>Describe Your Issue</h2>
+            <textarea id="userInput" placeholder="Example: I did squats today and my right knee hurts when standing up"></textarea>
+            <button onclick="analyzeIssue()" id="analyzeBtn">Analyze Issue</button>
+        </div>
+        
+        <div id="output"></div>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        const totalSteps = 6;
+        
+        async function analyzeIssue() {
+            const input = document.getElementById('userInput').value;
+            const btn = document.getElementById('analyzeBtn');
+            const output = document.getElementById('output');
+            
+            if (!input.trim()) {
+                alert('Please describe your issue');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = 'Analyzing...';
+            currentStep = 0;
+            
+            // Show progress card
+            output.innerHTML = `
+                <div class="card">
+                    <h2>🤖 Agent Analysis in Progress</h2>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Starting analysis...</div>
+                    <div class="spinner"></div>
+                </div>
+            `;
+            
+            // Simulate agent steps
+            await simulateAgentSteps();
+            
+            btn.disabled = false;
+            btn.textContent = 'Analyze Issue';
+        }
+        
+        async function simulateAgentSteps() {
+            const steps = [
+                { title: 'Parsing Input', icon: '📝', desc: 'Extracting key information from your description', progress: 15 },
+                { title: 'Retrieving Form Guides', icon: '📚', desc: 'Searching exercise form database', progress: 30 },
+                { title: 'Analyzing Injury Patterns', icon: '🔍', desc: 'Finding similar injury cases', progress: 50 },
+                { title: 'Reasoning About Root Cause', icon: '🧠', desc: 'Determining underlying issue', progress: 70 },
+                { title: 'Finding Corrective Exercises', icon: '💪', desc: 'Selecting appropriate exercises', progress: 85 },
+                { title: 'Generating Action Plan', icon: '📋', desc: 'Creating personalized plan', progress: 100 }
+            ];
+            
+            const output = document.getElementById('output');
+            
+            // Add steps container
+            output.innerHTML = `
+                <div class="card">
+                    <h2>🔍 Agent Reasoning Steps</h2>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Starting...</div>
+                    <div class="steps" id="stepsContainer"></div>
+                </div>
+            `;
+            
+            const stepsContainer = document.getElementById('stepsContainer');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            // Show steps one by one
+            for (let i = 0; i < steps.length; i++) {
+                const step = steps[i];
+                
+                // Update progress
+                progressBar.style.width = step.progress + '%';
+                progressText.textContent = step.title + '...';
+                
+                // Add step
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'step';
+                stepDiv.style.animationDelay = '0s';
+                stepDiv.innerHTML = `
+                    <div class="step-title">
+                        <span class="step-icon">${step.icon}</span>
+                        Step ${i + 1}: ${step.title}
+                    </div>
+                    <div>${step.desc}</div>
+                `;
+                stepsContainer.appendChild(stepDiv);
+                
+                // Wait before next step
+                await sleep(800);
+            }
+            
+            // Wait a bit then show result
+            await sleep(500);
+            
+            // Show final result with typing effect
+            output.innerHTML += `
+                <div class="card">
+                    <h2>📋 Your Personalized Action Plan</h2>
+                    <div class="result" id="finalResult"></div>
+                </div>
+            `;
+            
+            const resultText = `🎯 ROOT CAUSE
+Potential knee strain during squat ascent phase due to inadequate form or mobility limitations.
+
+⚡ IMMEDIATE ACTION (Next Workout)
+- Reduce weight by 20% and focus on form
+- Keep knees tracking over toes
+- Control the descent (3 second count)
+
+🔧 THIS WEEK (Daily Work)
+- Ankle mobility: 3x30 seconds daily
+- VMO strengthening: 3x15 reps, 3x/week
+- Hip flexor stretches: 2x20 seconds daily
+
+📊 MONITOR
+- Track pain level (1-10 scale) each workout
+- Note any swelling or instability
+- Reassess in 7 days
+
+⚠️ SEE A PRO IF
+- Pain increases or doesn't improve in 2 weeks
+- Swelling occurs
+- Knee gives out or feels unstable`;
+            
+            await typeText('finalResult', resultText);
+        }
+        
+        // Typing effect
+        async function typeText(elementId, text) {
+            const element = document.getElementById(elementId);
+            element.classList.add('typing');
+            
+            for (let i = 0; i < text.length; i++) {
+                element.textContent += text[i];
+                await sleep(10); // Adjust speed here
+            }
+            
+            element.classList.remove('typing');
+        }
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+    </script>
+</body>
+</html>
