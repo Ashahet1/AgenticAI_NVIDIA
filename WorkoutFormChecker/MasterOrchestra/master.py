@@ -33,6 +33,23 @@ class MasterOrchestrator:
             "agent": agent_name,
             "status": result.get("status", "unknown")
         })
+    def run(user_input: str):
+    """
+    Import-friendly entrypoint for server usage.
+    Returns the final_result dict from analyze_workout_issue.
+    """
+    orch = MasterOrchestrator()
+    return orch.analyze_workout_issue(user_input)
+
+    # Optional: provide a main() that accepts a list of args (for subprocess mode)
+    def main(argv=None):
+        argv = argv or []
+        # If args provided, use them; otherwise use a default test case
+        if argv:
+            user_input = " ".join(argv)
+        else:
+            user_input = "I did squats today and my right knee hurts when standing up"
+        return run(user_input)
     
     def analyze_workout_issue(self, user_input):
         
