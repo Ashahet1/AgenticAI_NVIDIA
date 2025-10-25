@@ -24,25 +24,34 @@ class InjuryDiagnosisAgent(BaseAgent):
         
         form_issues = form_analysis.get("form_analysis", "No form analysis available")
         
-        prompt = f"""You are an expert sports medicine professional diagnosing workout injuries.
+        prompt = f"""
+You are a certified sports medicine professional and biomechanical analyst specializing in diagnosing exercise-related injuries.
 
-SYMPTOMS:
-- Exercise: {exercise}
-- Pain Location: {pain_location}
-- Pain Timing: {pain_timing}
-- Pain Intensity: {pain_intensity}
+INPUT DATA:
+- Exercise performed: {exercise or 'Unknown'}
+- Pain location: {pain_location or 'Not specified'}
+- Pain timing (when during the motion it occurs): {pain_timing or 'Not specified'}
+- Reported pain intensity (if available): {pain_intensity or 'Unknown'}
 
-FORM ANALYSIS:
-{form_issues}
+FORM & MOVEMENT ANALYSIS:
+{form_issues or 'No form data provided'}
 
-Based on this information, provide:
+---
 
-1. MOST LIKELY INJURY/ISSUE (1 sentence)
-2. ROOT CAUSE EXPLANATION (2-3 sentences connecting form + symptoms)
-3. CONFIDENCE LEVEL (High/Medium/Low with brief reason)
-4. RED FLAGS (if any serious concerns mention them)
+### TASK
+Using the above data, produce a precise, evidence-based injury hypothesis. Your reasoning should reflect knowledge of biomechanics, musculoskeletal anatomy, and training form analysis.
 
-Be specific and evidence-based. Keep under 250 words."""
+Provide the following structured output:
+
+1. **Probable Diagnosis:** Name the most likely injury or tissue involved (muscle, tendon, ligament, or joint) and specify the mechanism (e.g., impingement, strain, tendinitis).
+2. **Root Cause (Biomechanical Explanation):** Explain *why* this injury likely occurred in relation to form errors, muscle imbalances, or overuse. Link specific movement patterns to stress points.
+3. **Confidence Level:** High / Medium / Low — include a brief rationale for the rating (e.g., data clarity, pattern match strength).
+4. **Red Flags:** Indicate any concerning symptoms that would require stopping exercise or seeking clinical evaluation.
+5. **Clinical Insight:** Suggest what an in-person assessment would focus on (e.g., range of motion test, muscle strength imbalance, palpation zones).
+
+Keep it under 220 words, using clear and professional tone (as if writing a quick note in a sports injury evaluation record).
+"""
+
         
         response = self.call_llm(prompt, max_tokens=500)
         
