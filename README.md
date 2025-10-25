@@ -4,6 +4,10 @@
 
 ---
 [![Live Demo](https://img.shields.io/badge/🌐%20Live%20Demo-Click%20Here-blueviolet?style=for-the-badge)](https://rebeca-groutiest-incorporeally.ngrok-free.dev/)
+---
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1BhrEQneXIRvGKZxGQxZ4dNuq2j8WfLJC#scrollTo=uqm4g9hOZTgw)
+
 ## 🚀 Motivation
 
 Every athlete or fitness enthusiast has faced it —  
