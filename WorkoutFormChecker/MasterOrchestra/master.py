@@ -1,6 +1,6 @@
-
-import sys
 import os
+import sys
+from contextlib import redirect_stdout
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, current_dir)
@@ -33,23 +33,6 @@ class MasterOrchestrator:
             "agent": agent_name,
             "status": result.get("status", "unknown")
         })
-    def run(user_input: str):
-    """
-    Import-friendly entrypoint for server usage.
-    Returns the final_result dict from analyze_workout_issue.
-    """
-    orch = MasterOrchestrator()
-    return orch.analyze_workout_issue(user_input)
-
-    # Optional: provide a main() that accepts a list of args (for subprocess mode)
-    def main(argv=None):
-        argv = argv or []
-        # If args provided, use them; otherwise use a default test case
-        if argv:
-            user_input = " ".join(argv)
-        else:
-            user_input = "I did squats today and my right knee hurts when standing up"
-        return run(user_input)
     
     def analyze_workout_issue(self, user_input):
         
@@ -76,8 +59,6 @@ class MasterOrchestrator:
         self.log_step("Diagnose Injury", "InjuryDiagnosisAgent", injury_result)
         print(f"✅ Diagnosis complete (confidence: {injury_result.get('confidence')})")
         
-        if injury_result.get('requires_medical_attention'):
-            print("⚠️  WARNING: Medical attention may be required!")
         
         # STEP 4
         print("\n🔍 STEP 4: Researching supporting evidence...")
@@ -122,25 +103,66 @@ class MasterOrchestrator:
             "steps": self.workflow_steps
         }
 
+# ============ MODULE-LEVEL FUNCTIONS (Outside the class) ============
+
+def run(user_input: str):
+    """
+    Import-friendly entrypoint for server usage.
+    Returns both the final_result dict and the printed output text.
+    """
+    from io import StringIO
+    from contextlib import redirect_stdout
+
+    buf = StringIO()
+    orch = MasterOrchestrator()
+    with redirect_stdout(buf):
+        result = orch.analyze_workout_issue(user_input)
+
+        # Replicate the pretty summary block
+        print("\n" + "="*60)
+        print("📊 FINAL RESULTS")
+        print("="*60)
+
+        print("\n🎯 ACTION PLAN:")
+        print(result['action_plan'])
+
+        
+    printed_output = buf.getvalue()
+    return {"result": result, "printed": printed_output}
+
+
+def main(argv=None):
+    """
+    Main function that accepts command-line args
+    """
+    argv = argv or []
+    
+    if argv:
+        user_input = " ".join(argv)
+    else:
+        user_input = "I did squats today and my right knee hurts when standing up"
+    
+    return run(user_input)
+
+# ============ MAIN EXECUTION ============
+
 if __name__ == "__main__":
     
     print("🧪 Testing Master Orchestrator with MULTIPLE test cases...\n")
     
-    orchestrator = MasterOrchestrator()
-    
-    # TEST CASE - Change this to test different exercises!
+    # TEST CASES
     test_cases = [
         "My lower back hurts after deadlifts, especially at the bottom of the movement",
         "I feel sharp shoulder pain when lowering the bar during bench press",
         "I did squats today and my right knee hurts when standing up"
     ]
     
-    # Run the first test case (change index to test others)
-    test_input = test_cases[1]  # Change to [1] or [2] to test different cases
+    # Run test case (change index to test different cases)
+    test_input = test_cases[1]  # 0=deadlift, 1=bench, 2=squat
     
     print(f"📝 Testing with: '{test_input}'\n")
     
-    result = orchestrator.analyze_workout_issue(test_input)
+    result = run(test_input)  # Uses module-level run() function
     
     print("\n" + "="*60)
     print("📊 FINAL RESULTS")
@@ -148,11 +170,11 @@ if __name__ == "__main__":
     print("\n🎯 ACTION PLAN:")
     print(result['action_plan'])
     
-    print("\n📚 WORKFLOW SUMMARY:")
-    for step in result['workflow_steps']:
-        print(f"  {step['step']}. {step['action']} - {step['agent']} [{step['status']}]")
+    #print("\n📚 WORKFLOW SUMMARY:")
+    #for step in result['workflow_steps']:
+    #    print(f"  {step['step']}. {step['action']} - {step['agent']} [{step['status']}]")
     
-    print("\n🔗 WEB SOURCES FOUND:")
-    for i, result_item in enumerate(result.get('web_results', []), 1):
-        print(f"  {i}. {result_item.get('title', 'N/A')}")
-        print(f"     {result_item.get('url', 'N/A')}")
+    #print("\n🔗 WEB SOURCES FOUND:")
+    #for i, result_item in enumerate(result.get('web_results', []), 1):
+    #    print(f"  {i}. {result_item.get('title', 'N/A')}")
+    #    print(f"     {result_item.get('url', 'N/A')}")
