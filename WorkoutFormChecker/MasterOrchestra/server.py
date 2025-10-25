@@ -31,9 +31,9 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# Path to master.py (adjust if you place server.py elsewhere)
-MASTER_REL_PATH = os.path.join("WorkoutFormChecker", "MasterOrchestra", "master.py")
-MASTER_PATH = os.path.join(os.getcwd(), MASTER_REL_PATH)
+# Resolve master.py relative to this server.py file so the server is robust to cwd
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # WorkoutFormChecker/MasterOrchestra
+MASTER_PATH = os.path.join(BASE_DIR, "master.py")
 
 EXECUTOR = ThreadPoolExecutor(max_workers=2)
 DEFAULT_TIMEOUT = 30  # seconds
