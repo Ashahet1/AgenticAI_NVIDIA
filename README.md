@@ -49,7 +49,6 @@ Each agent is modular and can be independently upgraded or replaced for fine-tun
 - 🌐 **Web UI integration** — interactive frontend with progress animation.
 - ⚡ **Flask backend** with `/run` endpoint for analysis orchestration.
 - 🔄 **CORS-enabled** for direct connection via ngrok or local frontend.
-- Light/Dark feature UI
 ---
 
 ## 🧰 Tech Stack
