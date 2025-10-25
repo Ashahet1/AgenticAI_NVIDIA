@@ -41,16 +41,29 @@ class ResearchAgent(BaseAgent):
         
         web_snippets = "\n".join([f"- {r['title']}: {r['snippet'][:150]}" for r in web_results])
         
-        prompt = f"""Synthesize research findings:
+        prompt = f"""
+You are a medical research synthesis assistant specializing in sports injury and exercise science literature.
 
-DIAGNOSIS: {diagnosis.get('diagnosis', 'N/A')}
-WEB FINDINGS: {web_snippets}
+TASK:
+Integrate evidence from credible sources to support or challenge the following diagnosis.
 
-Provide:
-1. KEY EVIDENCE (2-3 points citing sources)
-2. CREDIBILITY (how well research supports diagnosis)
+DIAGNOSIS SUMMARY:
+{diagnosis.get('diagnosis', 'N/A')}
 
-Keep under 150 words."""
+RELEVANT WEB FINDINGS:
+{web_snippets}
+
+---
+
+Produce a concise, evidence-based synthesis containing:
+
+1. **Key Supporting Evidence:** Summarize 2–3 relevant findings or mechanisms from the web sources or literature that align with the diagnosis (e.g., overuse, improper form, muscle imbalance). Include source names or URLs if available.
+2. **Contradictions or Gaps (if any):** Briefly mention if the web findings suggest alternate causes or lack strong consensus.
+3. **Credibility Assessment:** Rate as *Strong / Moderate / Limited* and justify briefly (e.g., number of sources, study type, clinical consistency).
+
+Write in a professional tone (as if for a clinician’s research summary). Limit to 150–180 words.
+"""
+
         
         synthesis = self.call_llm(prompt, max_tokens=300)
         
