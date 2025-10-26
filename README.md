@@ -73,17 +73,20 @@ Each agent is modular and can be independently upgraded or replaced for fine-tun
 WorkoutFormChecker/
 │
 ├── MasterOrchestra/
-│   ├── server.py                # Flask backend
-│   ├── master.py                # Master orchestrator managing all agents
-│   ├── base_agent.py            # Shared logging + utility class
-│   ├── parsing_agent.py         # Step 1 - Parse user input
-│   ├── form_analysis_agent.py   # Step 2 - Analyze form
-│   ├── injury_diagnosis_agent.py# Step 3 - Diagnose issue
-│   ├── research_agent.py        # Step 4 - Gather evidence
-│   ├── prescription_agent.py    # Step 5 - Generate plan
+│   ├── server.py                   # 🌐 Flask backend exposing /run endpoint
+│   ├── master.py                   # 🧠 Agentic Orchestrator with integrated ReasoningController
+│   │                                # (Reason → Reflect → Retry loop with confidence feedback)
+│   ├── base_agent.py               # 🧩 Base agent class with logging and safe execution
+│   ├── parsing_agent.py            # 🧾 Step 1 - Parse workout input and reasoning fields
+│   ├── form_analysis_agent.py      # 🏋️ Step 2 - Analyze biomechanics and detect form issues
+│   ├── injury_diagnosis_agent.py   # 🩺 Step 3 - Diagnose probable injury and root cause
+│   ├── research_agent.py           # 🔍 Step 4 - Retrieve supporting biomechanical/medical evidence
+│   ├── prescription_agent.py       # 📋 Step 5 - Generate personalized recovery & prevention plan
 │
-├── frontend.html                # Simple web interface with progress animation
-└── README.md                    # You are here 😄
+├── frontend.html                   # 💻 Interactive web UI with animated reasoning progress
+├── requirements.txt                # 📦 Flask, Flask-CORS, and dependencies
+└── README.md                       # 🧭 Project overview and setup instructions
+
 ```
 
 
