@@ -1,4 +1,3 @@
-
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -57,15 +56,20 @@ RELEVANT WEB FINDINGS:
 
 Produce a concise, evidence-based synthesis containing:
 
-1. **Key Supporting Evidence:** Summarize 2–3 relevant findings or mechanisms from the web sources or literature that align with the diagnosis (e.g., overuse, improper form, muscle imbalance). Include source names or URLs if available.
-2. **Contradictions or Gaps (if any):** Briefly mention if the web findings suggest alternate causes or lack strong consensus.
-3. **Credibility Assessment:** Rate as *Strong / Moderate / Limited* and justify briefly (e.g., number of sources, study type, clinical consistency).
+1. Key Supporting Evidence: Summarize 2–3 relevant findings or mechanisms from the web sources or literature that align with the diagnosis (e.g., overuse, improper form, muscle imbalance). Include source names or URLs if available.
+2. Contradictions or Gaps (if any): Briefly mention if the web findings suggest alternate causes or lack strong consensus.
+3. Credibility Assessment: Rate as Strong / Moderate / Limited and justify briefly (e.g., number of sources, study type, clinical consistency).
 
-Write in a professional tone (as if for a clinician’s research summary). Limit to 150–180 words.
+Write in a professional tone (as if for a clinician's research summary). Limit to 150–180 words.
+
+IMPORTANT: Do not use any markdown formatting such as ** for bold or * for italics. Use plain text only with clear section labels.
 """
 
         
         synthesis = self.call_llm(prompt, max_tokens=300)
+        
+        # Remove any remaining ** markdown formatting as a safety measure
+        synthesis = synthesis.replace('**', '')
         
         self.log_action("research_evidence", {
             "tool": "WebSearchTool",
