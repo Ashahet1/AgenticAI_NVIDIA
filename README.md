@@ -88,7 +88,9 @@ WorkoutFormChecker/
 └── README.md                       # 🧭 Project overview and setup instructions
 
 ```
-
+---
+## Architecture Diagram
+![AWS SageMaker Architecture](https://github.com/Ashahet1/AgenticAI_NVIDIA/blob/main/WorkoutFormChecker/Images/aws_sagemaker_architecture%20(2).svg)
 
 ---
 
