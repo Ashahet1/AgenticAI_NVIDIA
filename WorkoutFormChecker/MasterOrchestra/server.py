@@ -17,13 +17,25 @@ def serve_frontend():
 def serve_static_files(path):
     return send_from_directory(app.static_folder, path)
 
+@app.route("/health")
+def health():
+    return jsonify({"ok": True, "status": "Server running", "time": time.time()})
+
 
 @app.route("/run", methods=["POST"])
 def run_endpoint():
     start = time.time()
     try:
         payload = request.get_json(force=True)
-        user_input = payload.get("input", "")
+        user_input = payload.get("input", "").strip()
+
+        if not user_input:
+            return jsonify({
+                "ok": False,
+                "error": "No input provided. Please type your workout issue before running analysis."
+            }), 400
+
+        print(f"🧠 Received input: {user_input}")
 
         # call master.py's run() → returns dict
         run_result = run(user_input)
@@ -31,18 +43,23 @@ def run_endpoint():
         printed = run_result["printed"]
 
         elapsed = int((time.time() - start) * 1000)
+        print(f"✅ Analysis completed in {elapsed} ms")
+
         return jsonify({
             "ok": True,
             "result": final,
             "printed": printed,
             "elapsed_ms": elapsed
         })
+
     except Exception as e:
         import traceback
+        err_msg = traceback.format_exc()
+        print(f"❌ Server error: {err_msg}")
         return jsonify({
             "ok": False,
             "error": str(e),
-            "trace": traceback.format_exc()
+            "trace": err_msg
         }), 500
 
 
