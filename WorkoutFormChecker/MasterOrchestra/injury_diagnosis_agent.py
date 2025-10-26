@@ -1,4 +1,3 @@
-
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -38,22 +37,27 @@ FORM & MOVEMENT ANALYSIS:
 
 ---
 
-### TASK
+TASK:
 Using the above data, produce a precise, evidence-based injury hypothesis. Your reasoning should reflect knowledge of biomechanics, musculoskeletal anatomy, and training form analysis.
 
 Provide the following structured output:
 
-1. **Probable Diagnosis:** Name the most likely injury or tissue involved (muscle, tendon, ligament, or joint) and specify the mechanism (e.g., impingement, strain, tendinitis).
-2. **Root Cause (Biomechanical Explanation):** Explain *why* this injury likely occurred in relation to form errors, muscle imbalances, or overuse. Link specific movement patterns to stress points.
-3. **Confidence Level:** High / Medium / Low — include a brief rationale for the rating (e.g., data clarity, pattern match strength).
-4. **Red Flags:** Indicate any concerning symptoms that would require stopping exercise or seeking clinical evaluation.
-5. **Clinical Insight:** Suggest what an in-person assessment would focus on (e.g., range of motion test, muscle strength imbalance, palpation zones).
+1. Probable Diagnosis: Name the most likely injury or tissue involved (muscle, tendon, ligament, or joint) and specify the mechanism (e.g., impingement, strain, tendinitis).
+2. Root Cause (Biomechanical Explanation): Explain why this injury likely occurred in relation to form errors, muscle imbalances, or overuse. Link specific movement patterns to stress points.
+3. Confidence Level: High / Medium / Low — include a brief rationale for the rating (e.g., data clarity, pattern match strength).
+4. Red Flags: Indicate any concerning symptoms that would require stopping exercise or seeking clinical evaluation.
+5. Clinical Insight: Suggest what an in-person assessment would focus on (e.g., range of motion test, muscle strength imbalance, palpation zones).
 
 Keep it under 220 words, using clear and professional tone (as if writing a quick note in a sports injury evaluation record).
+
+IMPORTANT: Do not use any markdown formatting such as ** for bold or * for italics. Use plain text only with clear section labels.
 """
 
         
         response = self.call_llm(prompt, max_tokens=500)
+        
+        # Remove any remaining ** markdown formatting as a safety measure
+        response = response.replace('**', '')
         
         confidence = "medium"
         if "high confidence" in response.lower() or "likely" in response.lower():
