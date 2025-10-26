@@ -46,15 +46,10 @@ NO ** stars. Plain text with bullets."""
         
         action_plan = self.call_llm(prompt, max_tokens=600)
         
-        # FORCE add references
-        if web_results:
-            action_plan += "\n\n" + "="*60
-            action_plan += "\n📚 REFERENCES\n"
-            action_plan += "="*60 + "\n"
-            for i, r in enumerate(web_results, 1):
-                if r.get('url'):
-                    action_plan += f"\n{i}. {r['title']}\n"
-                    action_plan += f"   🔗 {r['url']}\n"
+        # Remove any remaining ** or * markdown formatting as a safety measure
+        action_plan = action_plan.replace('**', '').replace('*', '')
+        
+        # References are now shown in the sidebar, so we don't add them here
         
         self.log_action("create_plan", {"refs": len(web_results)})
         
