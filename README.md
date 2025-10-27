@@ -1,4 +1,4 @@
-# 🏋️‍♂️ Workout Form Checker — AI-Powered Injury Analysis & Action Plan Generator
+# 🏋️‍♂️ Workout InjuryIntel — AI-Powered Injury Analysis & Action Plan Generator
 
 > **Smart multi-agent system** that analyzes workout-related pain or discomfort, diagnoses likely form or injury issues, and provides a personalized action plan — all powered by reasoning agents.
 
