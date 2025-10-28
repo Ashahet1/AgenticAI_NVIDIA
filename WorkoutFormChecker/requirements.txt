@@ -2,7 +2,6 @@
 fastapi==0.104.1
 uvicorn
 pydantic==2.5.0
-flask flask-cors
 
 # Vector Database And Embeddings
 chromadb
@@ -14,6 +13,9 @@ torch==2.3.1
 accelerate==0.25.0
 bitsandbytes==0.32.1
 
+#OpenAI
+openai
+
 # AWS Sagemaker
 boto3
 sagemaker
@@ -23,5 +25,15 @@ python-dotenv==1.0.0
 python-multipart==0.0.6
 
 ipywidgets==8.1.1
-
 notebook==7.0.6
+
+# frontend
+flask
+flask-cors
+requests
+
+#ngrok
+pyngrok
+
+PyMuPDF
+numpy 
