@@ -1,13 +1,17 @@
+# master.py
+
 import os
 import sys
 import time
 from io import StringIO
 from contextlib import redirect_stdout
 
-# Ensure imports work regardless of runtime path
+# Ensure imports work
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, current_dir)
 
+from conversation_manager import ConversationManager
+from planner_agent import PlannerAgent
 from parsing_agent import ParsingAgent
 from form_analysis_agent import FormAnalysisAgent
 from injury_diagnosis_agent import InjuryDiagnosisAgent
@@ -16,219 +20,413 @@ from prescription_agent import PrescriptionAgent
 
 
 # =====================================================
-# 🧠 Reasoning Controller — the reflective agent brain
+# 🪞 Reflection Controller (Quality Checks)
 # =====================================================
-class ReasoningController:
-    def __init__(self, max_attempts=3):
-        self.max_attempts = max_attempts
+class ReflectionController:
+    """
+    Evaluates agent output quality and confidence
+    Decides if we need to retry, gather more info, or proceed
+    """
+    
+    def __init__(self):
         self.reflections = []
         self.confidence_map = {"low": 1, "medium": 2, "high": 3}
-
+    
     def evaluate_confidence(self, level):
+        """Convert confidence string to numeric score"""
         return self.confidence_map.get(str(level).lower(), 1)
-
-    def reflect(self, step, agent_name, confidence, notes=""):
-        """Logs human-like reflection and decides whether to retry."""
-        print(f"\n🧠 Reflection after {agent_name}:")
+    
+    def reflect_on_result(self, agent_name, result, state):
+        """
+        Evaluate agent result quality
+        
+        Returns:
+            dict with:
+                - should_continue: bool
+                - needs_more_info: bool  
+                - feedback: str
+        """
+        confidence = result.get("confidence", "unknown")
+        
+        print(f"\n🪞 Reflection on {agent_name}:")
+        print(f"   Confidence: {confidence}")
+        
+        # Check confidence level
         if confidence == "high":
-            print(f"✨ Confidence is high. Reasoning stable — moving forward.")
-            return False
+            print(f"   ✅ High confidence - proceeding")
+            return {
+                "should_continue": True,
+                "needs_more_info": False,
+                "feedback": "High quality result"
+            }
+        
         elif confidence == "medium":
-            print(f"🤔 Moderate confidence detected. {notes or 'Continuing but noting possible uncertainty.'}")
-            return False
-        else:
-            print(f"⚠️ Low confidence detected from {agent_name}. Triggering deeper reflection...")
-            self.reflections.append(f"{agent_name} uncertainty — cause: {notes or 'unclear pattern'}")
-            return True
-
-    def summarize(self):
-        print("\n" + "="*60)
-        print("🪞 REFLECTION SUMMARY")
-        print("="*60)
-        if not self.reflections:
-            print("✅ All reasoning steps reached stable confidence without retries.")
-        else:
-            for i, r in enumerate(self.reflections, 1):
-                print(f"{i}. {r}")
-        print("="*60 + "\n")
-
-
-# =====================================================
-# 🎼 Master Orchestrator (Agentic version)
-# =====================================================
-class MasterOrchestrator:
-
-    def __init__(self):
-        print("🎼 Initializing Master Orchestrator with reasoning loop...")
-        self.parsing_agent = ParsingAgent()
-        self.form_agent = FormAnalysisAgent()
-        self.injury_agent = InjuryDiagnosisAgent()
-        self.research_agent = ResearchAgent()
-        self.prescription_agent = PrescriptionAgent()
-        self.reasoning = ReasoningController()
-        self.workflow_steps = []
-        print("✅ All agents initialized successfully!")
-
-    def log_step(self, step_name, agent_name, result):
-        self.workflow_steps.append({
-            "step": len(self.workflow_steps) + 1,
-            "action": step_name,
-            "agent": agent_name,
-            "status": result.get("status", "unknown"),
-            "confidence": result.get("confidence", "unknown")
-        })
-
-    # ================================================
-    # 🔁 Agentic reasoning-driven workflow
-    # ================================================
-    def analyze_workout_issue(self, user_input):
-        print("\n" + "="*60)
-        print("🤖 AGENTIC MULTI-AGENT ANALYSIS STARTED")
-        print("="*60)
-
-        enriched_context = None
-        attempts = 0
-
-        # Reasoning loop
-        while attempts < self.reasoning.max_attempts:
-            attempts += 1
-            print(f"\n🔄 Iteration {attempts}/{self.reasoning.max_attempts}")
-
-            # STEP 1: Parsing
-            print("\n📝 STEP 1: Parsing user input...")
-            parsing_result = self.parsing_agent.execute(user_input)
-            self.log_step("Parse Input", "ParsingAgent", parsing_result)
-            parsed_data = parsing_result.get("parsed_data", {})
-
-            # Merge reasoning fields if available
-            parsed_data.update({
-                "duration_since_onset": parsed_data.get("duration_since_onset", "unknown"),
-                "previous_injuries": parsed_data.get("previous_injuries", "none reported"),
-                "training_experience": parsed_data.get("training_experience", "unspecified"),
-                "warmup_routine": parsed_data.get("warmup_routine", "unspecified"),
-                "equipment": parsed_data.get("equipment", "not specified"),
-                "surface": parsed_data.get("surface", "unknown"),
-                "environment": parsed_data.get("environment", "unspecified"),
-                "what_they_did_after": parsed_data.get("what_they_did_after", "no action taken"),
-                "improvement_since": parsed_data.get("improvement_since", "unknown"),
-                "goal": parsed_data.get("goal", "recover and continue training safely")
-            })
-
-            print(f"✅ Extracted: {parsed_data.get('exercise')} | {parsed_data.get('pain_location')} | {parsed_data.get('pain_timing')}")
-            print(f"🧩 Extended reasoning fields integrated for deeper context.")
-
-            # STEP 2: Form analysis
-            print("\n🏋️ STEP 2: Analyzing form patterns and deviations...")
-            form_result = self.form_agent.execute(parsed_data)
-            self.log_step("Analyze Form", "FormAnalysisAgent", form_result)
-            print(f"🧠 Form Analysis Insight: {form_result.get('form_analysis', 'N/A')}")
-            print(f"🧾 Confidence: {form_result.get('confidence')}")
-
-            if not self.reasoning.reflect("FormAnalysis", "FormAnalysisAgent", form_result.get("confidence", "low")):
-                pass
-            else:
-                print("🔁 Re-evaluating with adjusted biomechanics assumptions...\n")
-                continue
-
-            # STEP 3: Injury diagnosis
-            print("\n🩺 STEP 3: Diagnosing injury pattern based on symptoms and form...")
-            injury_result = self.injury_agent.execute(parsed_data, form_result)
-            self.log_step("Diagnose Injury", "InjuryDiagnosisAgent", injury_result)
-            print(f"🧠 Injury Diagnosis: {injury_result.get('diagnosis')}")
-            print(f"📉 Confidence: {injury_result.get('confidence')}")
-
-            if not self.reasoning.reflect("InjuryDiagnosis", "InjuryDiagnosisAgent", injury_result.get("confidence", "low")):
-                pass
-            else:
-                print("🔁 Re-thinking injury mechanism and context...")
-                continue
-
-            # STEP 4: Research
-            print("\n🔍 STEP 4: Researching relevant evidence and studies...")
-            research_result = self.research_agent.execute(injury_result, parsed_data)
-            self.log_step("Research Evidence", "ResearchAgent", research_result)
-            print(f"📚 Found {len(research_result.get('web_results', []))} supporting studies.")
-            print(f"🧠 Research synthesis: {research_result.get('synthesis', 'N/A')}")
-
-            # STEP 5: Prescription
-            print("\n📋 STEP 5: Building personalized recovery plan...")
-            prescription_result = self.prescription_agent.execute(
-                injury_result,
-                research_result,
-                form_result,
-                parsed_data
-            )
-            self.log_step("Create Action Plan", "PrescriptionAgent", prescription_result)
-            print(f"✅ Plan Generated: {prescription_result.get('action_plan', '')[:200]}...")
-
-            # Confidence check
-            final_conf = injury_result.get("confidence", "low")
-            if self.reasoning.evaluate_confidence(final_conf) >= 2:
-                print("\n🎯 Confidence stabilized — exiting reasoning loop.")
-                break
-            else:
-                print("\n🔁 Confidence still low — triggering self-reflection cycle.")
-                time.sleep(1.5)
-
-        print("\n" + "="*60)
-        print("✅ AGENTIC MULTI-AGENT ANALYSIS COMPLETE")
-        print("="*60)
-
-        # Final reflection summary
-        #self.reasoning.summarize()
-
+            print(f"   🤔 Medium confidence - acceptable, continuing")
+            return {
+                "should_continue": True,
+                "needs_more_info": False,
+                "feedback": "Acceptable confidence level"
+            }
+        
+        else:  # low or unknown
+            print(f"   ⚠️ Low confidence - may need more evidence")
+            self.reflections.append(f"{agent_name}: Low confidence detected")
+            
+            return {
+                "should_continue": True,  # Let planner decide what to do
+                "needs_more_info": True,
+                "feedback": "Low confidence - consider gathering more evidence"
+            }
+    
+    def get_reflection_summary(self):
+        """Get summary of all reflections"""
         return {
-            "user_input": user_input,
-            "parsed_data": parsed_data,
-            "form_analysis": form_result.get("form_analysis"),
-            "diagnosis": injury_result.get("diagnosis"),
-            "research_findings": research_result.get("synthesis"),
-            "web_sources": research_result.get("sources", []),
-            "web_results": research_result.get("web_results", []),
-            "action_plan": prescription_result.get("action_plan"),
-            "workflow_steps": self.workflow_steps,
-            "total_steps": len(self.workflow_steps),
-            "requires_medical_attention": injury_result.get("requires_medical_attention", False)
+            "total_reflections": len(self.reflections),
+            "issues": self.reflections
         }
 
 
 # =====================================================
-# Entry Points
+# 🎼 Dynamic Master Orchestrator
 # =====================================================
-def run(user_input: str):
-    """Entry for server or Colab."""
+class DynamicMasterOrchestrator:
+    """
+    Dynamic multi-agent orchestration with conversational flow
+    
+    - Uses PlannerAgent to decide which agent runs next
+    - Supports multi-turn conversation
+    - Can pause and ask user for clarification
+    - Dynamically adapts workflow based on case complexity
+    """
+    
+    def __init__(self):
+        print("🎼 Initializing Dynamic Master Orchestrator...")
+        
+        # Initialize all agents (pool, not pipeline!)
+        self.agents = {
+            "ParsingAgent": ParsingAgent(),
+            "FormAnalysisAgent": FormAnalysisAgent(),
+            "InjuryDiagnosisAgent": InjuryDiagnosisAgent(),
+            "ResearchAgent": ResearchAgent(),
+            "PrescriptionAgent": PrescriptionAgent()
+        }
+        
+        # Initialize orchestration components
+        self.planner = PlannerAgent()
+        self.conversation_manager = ConversationManager()
+        self.reflection = ReflectionController()
+        
+        # State tracking
+        self.state = {
+            "collected_data": {},
+            "agent_results": {},
+            "confidence": "unknown",
+            "last_agent": None,
+            "workflow_complete": False
+        }
+        
+        print("✅ All agents and orchestration components initialized!")
+    
+    def process_user_message(self, user_message):
+        """
+        Process ONE user message in the dynamic workflow
+        
+        This is called each time user sends a message
+        Can return:
+        - "question" type: Need more info from user
+        - "processing" type: Analysis in progress  
+        - "complete" type: Final result ready
+        
+        Args:
+            user_message: str - User's message
+            
+        Returns:
+            dict with type, content, and state
+        """
+        
+        print("\n" + "="*70)
+        print(f"📨 Processing user message: {user_message[:80]}...")
+        print("="*70)
+        
+        # Add user message to conversation
+        self.conversation_manager.add_message("user", user_message)
+        
+        # Dynamic execution loop
+        max_iterations = 15  # Safety limit
+        iteration = 0
+        
+        while iteration < max_iterations:
+            iteration += 1
+            print(f"\n🔄 Iteration {iteration}")
+            
+            # STEP 1: Ask Planner what to do next
+            decision = self.planner.decide_next_action(self.state)
+            
+            action = decision["action"]
+            reason = decision["reason"]
+            
+            print(f"   🧠 Planner Decision: {action}")
+            print(f"   📝 Reason: {reason}")
+            
+            # STEP 2: Execute decision
+            
+            # CASE A: Need to ask user a question
+            if action == "ask_user":
+                question = decision["question"]
+                
+                self.conversation_manager.add_message("agent", question, "PlannerAgent")
+                
+                return {
+                    "type": "question",
+                    "question": question,
+                    "reason": reason,
+                    "conversation": self.conversation_manager.conversation_history,
+                    "state": self._get_state_snapshot()
+                }
+            
+            # CASE B: Run an agent
+            elif action == "run_agent":
+                agent_name = decision["agent"]
+                
+                # Execute the agent
+                result = self._execute_agent(agent_name, user_message)
+                
+                # Store result
+                self.state["agent_results"][agent_name] = result
+                self.state["last_agent"] = agent_name
+                
+                # Update collected data if parsing result
+                if "parsed_data" in result:
+                    self.conversation_manager.update_collected_data(result["parsed_data"])
+                    self.state["collected_data"] = self.conversation_manager.collected_data
+                
+                # Update confidence
+                if "confidence" in result:
+                    self.state["confidence"] = result["confidence"]
+                
+                # Record agent execution
+                self.planner.record_agent_execution(agent_name)
+                
+                # Reflection: Check result quality
+                reflection_result = self.reflection.reflect_on_result(
+                    agent_name, 
+                    result, 
+                    self.state
+                )
+                
+                # Continue loop (planner will decide next action)
+                continue
+            
+            # CASE C: Workflow complete
+            elif action == "complete":
+                print("\n✅ Workflow complete - compiling final result")
+                
+                self.state["workflow_complete"] = True
+                
+                final_result = self._compile_final_result()
+                
+                return {
+                    "type": "complete",
+                    "result": final_result,
+                    "conversation": self.conversation_manager.conversation_history,
+                    "execution_summary": self.planner.get_execution_summary(),
+                    "reflection_summary": self.reflection.get_reflection_summary(),
+                    "state": self._get_state_snapshot()
+                }
+            
+            # CASE D: Unknown action (shouldn't happen)
+            else:
+                print(f"⚠️ Unknown action: {action}")
+                break
+        
+        # Safety: Max iterations reached
+        print(f"⚠️ Max iterations ({max_iterations}) reached")
+        
+        return {
+            "type": "error",
+            "error": "Max iterations reached - workflow did not complete",
+            "state": self._get_state_snapshot()
+        }
+    
+    def _execute_agent(self, agent_name, context):
+        """
+        Execute a specific agent with appropriate inputs
+        
+        Args:
+            agent_name: Name of agent to execute
+            context: User's original message (for parsing)
+        
+        Returns:
+            Agent result dict
+        """
+        
+        print(f"\n⚡ Executing: {agent_name}")
+        
+        agent = self.agents[agent_name]
+        
+        # Route to correct agent with correct inputs
+        
+        if agent_name == "ParsingAgent":
+            # Parsing needs the raw user message
+            return agent.execute(context)
+        
+        elif agent_name == "FormAnalysisAgent":
+            # Form analysis needs parsed data
+            return agent.execute(self.state["collected_data"])
+        
+        elif agent_name == "InjuryDiagnosisAgent":
+            # Diagnosis needs parsed data + form analysis
+            form_result = self.state["agent_results"].get("FormAnalysisAgent", {})
+            return agent.execute(self.state["collected_data"], form_result)
+        
+        elif agent_name == "ResearchAgent":
+            # Research needs diagnosis + parsed data
+            diagnosis = self.state["agent_results"].get("InjuryDiagnosisAgent", {})
+            return agent.execute(diagnosis, self.state["collected_data"])
+        
+        elif agent_name == "PrescriptionAgent":
+            # Prescription needs everything
+            diagnosis = self.state["agent_results"].get("InjuryDiagnosisAgent", {})
+            research = self.state["agent_results"].get("ResearchAgent", {})
+            form = self.state["agent_results"].get("FormAnalysisAgent", {})
+            return agent.execute(diagnosis, research, form, self.state["collected_data"])
+        
+        else:
+            print(f"❌ Unknown agent: {agent_name}")
+            return {"error": f"Unknown agent: {agent_name}"}
+    
+    def _compile_final_result(self):
+        """
+        Compile all agent results into final output
+        """
+        
+        agent_results = self.state["agent_results"]
+        
+        # Extract key information
+        parsed_data = self.state.get("collected_data", {})
+        
+        form_analysis = agent_results.get("FormAnalysisAgent", {}).get("form_analysis", "N/A")
+        
+        diagnosis = agent_results.get("InjuryDiagnosisAgent", {}).get("diagnosis", "N/A")
+        
+        research = agent_results.get("ResearchAgent", {})
+        research_synthesis = research.get("synthesis", "N/A")
+        web_sources = research.get("sources", [])
+        web_results = research.get("web_results", [])
+        
+        action_plan = agent_results.get("PrescriptionAgent", {}).get("action_plan", "N/A")
+        
+        requires_medical = agent_results.get("InjuryDiagnosisAgent", {}).get("requires_medical_attention", False)
+        
+        return {
+            "user_input": self.conversation_manager.conversation_history[0]["content"] if self.conversation_manager.conversation_history else "",
+            "parsed_data": parsed_data,
+            "form_analysis": form_analysis,
+            "diagnosis": diagnosis,
+            "research_findings": research_synthesis,
+            "web_sources": web_sources,
+            "web_results": web_results,
+            "action_plan": action_plan,
+            "agents_executed": self.planner.execution_history,
+            "total_agents": len(set(self.planner.execution_history)),
+            "conversation_turns": len(self.conversation_manager.conversation_history),
+            "requires_medical_attention": requires_medical
+        }
+    
+    def _get_state_snapshot(self):
+        """Get current state for debugging/API response"""
+        return {
+            "collected_data": self.state["collected_data"],
+            "confidence": self.state["confidence"],
+            "last_agent": self.state["last_agent"],
+            "agents_executed": self.planner.execution_history,
+            "conversation_turns": len(self.conversation_manager.conversation_history)
+        }
+
+
+# =====================================================
+# 🚀 Entry Points
+# =====================================================
+
+def run_conversation(user_message):
+    """
+    Entry point for conversational flow
+    Processes ONE message at a time
+    
+    Args:
+        user_message: User's message
+        
+    Returns:
+        Response dict with type and content
+    """
+    
+    # Create or load orchestrator
+    # In real implementation, this would be session-based
+    orchestrator = DynamicMasterOrchestrator()
+    
+    # Process message
+    result = orchestrator.process_user_message(user_message)
+    
+    return result
+
+
+def run_single_shot(user_input):
+    """
+    Entry point for single-shot analysis (backward compatibility)
+    Processes entire flow in one go
+    
+    Args:
+        user_input: Complete user description
+        
+    Returns:
+        Final result dict
+    """
+    
     buf = StringIO()
-    orch = MasterOrchestrator()
+    orchestrator = DynamicMasterOrchestrator()
+    
     with redirect_stdout(buf):
-        result = orch.analyze_workout_issue(user_input)
-
-        print("\n" + "="*60)
-        print("📊 FINAL RESULTS")
-        print("="*60)
-        print("\n🎯 ACTION PLAN:")
-        print(result["action_plan"])
-
+        # Keep processing until complete
+        result = orchestrator.process_user_message(user_input)
+        
+        # If it asks questions, auto-skip them for single-shot mode
+        while result["type"] == "question":
+            # Force proceed without additional info
+            orchestrator.conversation_manager.force_proceed()
+            result = orchestrator.process_user_message("Continue with what you have")
+        
+        if result["type"] == "complete":
+            final = result["result"]
+            
+            print("\n" + "="*70)
+            print("📊 FINAL RESULTS")
+            print("="*70)
+            print("\n🎯 ACTION PLAN:")
+            print(final["action_plan"])
+    
     printed_output = buf.getvalue()
-    return {"result": result, "printed": printed_output}
+    
+    return {
+        "result": result.get("result", result),
+        "printed": printed_output
+    }
 
 
-def main(argv=None):
-    argv = argv or []
-    if argv:
-        user_input = " ".join(argv)
-    else:
-        user_input = "Deadlift — sharp lower back pain during lift, started 3 days ago."
-    return run(user_input)
+def main():
+    """
+    Main entry point for testing
+    """
+    print("🧪 Testing Dynamic Master Orchestrator...\n")
+    
+    # Test input
+    test_input = "Sharp right knee pain during squat ascent"
+    
+    result = run_single_shot(test_input)
+    
+    print(result["printed"])
+    
+    return result
 
-# ============ MAIN EXECUTION ============
 
 if __name__ == "__main__":
-    print("🧪 Running Agentic MasterOrchestrator in standalone mode...\n")
-
-    test_input = "I feel sharp shoulder pain"
-    output = run(test_input)
-
-    # Just print once — the captured version
-    print(output["printed"])
-    
-
+    main()
