@@ -3,13 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Workout Form Checker</title>
+  <title>Workout InjuryIntel</title>
 
-  <!-- System font + Inter fallback for clarity -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* (styles same as before — readable defaults) */
     :root {
       --bg: #f6f8fb;
       --card-bg: #ffffff;
@@ -47,7 +45,7 @@
     .card{border-radius:12px;padding:18px;background:var(--card-bg);box-shadow:var(--shadow-1);border:1px solid rgba(0,0,0,0.04)}
     textarea{width:100%;min-height:80px;padding:14px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:var(--card-bg);color:var(--text)}
     .controls{display:flex;gap:10px;margin-top:12px}
-    .btn{background: linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;padding:12px 16px;border-radius:10px;border:none;cursor:pointer;min-height:44px}
+    .btn{background: linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;padding:12px 16px;border-radius:10px;border:none;cursor:pointer;min-height:44px;font-weight:600}
     .btn.secondary{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--muted)}
     .suggestions { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px }
     .chip{padding:8px 10px;border-radius:999px;border:1px solid rgba(0,0,0,0.06);background:transparent;color:var(--muted);cursor:pointer}
@@ -64,44 +62,421 @@
     .reference-link:last-child{border-bottom:none}
     .summary-item{margin-bottom:8px;font-size:13px;line-height:1.5}
     .summary-label{font-weight:600;color:var(--text);display:inline-block;min-width:90px}
-    @media (max-width:980px){ .container{grid-template-columns:1fr} .header-controls{margin-left:0} }
+
+    /* USER PROFILE & AUTH STYLES */
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.06);
+      background: transparent;
+      cursor: pointer;
+      position: relative;
+    }
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .user-dropdown {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background: var(--card-bg);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 10px;
+      box-shadow: var(--shadow-1);
+      min-width: 200px;
+      z-index: 1000;
+      display: none;
+    }
+    .user-dropdown.show { display: block; }
+    .dropdown-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      font-size: 14px;
+    }
+    .dropdown-item:hover { background: rgba(0,0,0,0.02); }
+    .dropdown-item:last-child { border-bottom: none; }
+
+    /* MODAL STYLES */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .modal h2 {
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      color: var(--text);
+    }
+    .modal p {
+      margin: 0 0 24px 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* GOOGLE SIGN-IN BUTTON */
+    .google-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      background: white;
+      color: #3c4043;
+      font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .google-btn:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      border-color: #d2d3d4;
+    }
+    .google-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* DIVIDER */
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 24px 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .divider span {
+      padding: 0 12px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.06);
+      background: var(--card-bg);
+      color: var(--text);
+      font-size: 15px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .modal-actions .btn {
+      flex: 1;
+    }
+    .link-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+      font-size: 14px;
+      margin-top: 16px;
+      display: block;
+      text-align: center;
+      width: 100%;
+    }
+
+    /* LOCKED STATE */
+    .locked-overlay {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+      min-height: 300px;
+    }
+    .lock-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+    .locked-overlay h3 {
+      margin: 0 0 8px 0;
+      font-size: 20px;
+      color: var(--text);
+    }
+    .locked-overlay p {
+      margin: 0 0 24px 0;
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 400px;
+    }
+
+    /* HISTORY STYLES */
+    .history-item {
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.02);
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .history-item:hover {
+      background: rgba(0,0,0,0.04);
+      transform: translateX(2px);
+    }
+    .history-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .history-item-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
+    .history-item-date {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .history-item-preview {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 24px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    /* CHAT UI STYLING */
+    #chatContainer {
+      display: flex;
+      flex-direction: column;
+      height: 70vh;
+      background: var(--card-bg);
+      border: 1px solid rgba(0,0,0,0.04);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-1);
+      padding: 16px;
+    }
+
+    #chatMessages {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 8px;
+      scroll-behavior: smooth;
+    }
+
+    #chatMessages::-webkit-scrollbar {
+      width: 8px;
+    }
+    #chatMessages::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.08);
+      border-radius: 8px;
+    }
+
+    .chat-message {
+      margin: 8px 0;
+      padding: 10px 12px;
+      border-radius: 10px;
+      max-width: 85%;
+      line-height: 1.5;
+      word-wrap: break-word;
+    }
+
+    .chat-message.user {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: white;
+      margin-left: auto;
+    }
+
+    .chat-message.assistant {
+      background: rgba(0,0,0,0.05);
+      color: var(--text);
+    }
+
+    .chat-message.system {
+      font-style: italic;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width:980px){ 
+      .container{grid-template-columns:1fr} 
+      .header-controls{margin-left:0;flex-wrap:wrap} 
+    }
   </style>
 </head>
 <body>
+  <!-- AUTH MODAL -->
+  <div id="authModal" class="modal-overlay">
+    <div class="modal">
+      <div id="loginForm">
+        <h2>Welcome to InjuryIntel</h2>
+        <p>Sign in to analyze your workout injuries and track your progress</p>
+        
+        <!-- GOOGLE SIGN-IN BUTTON -->
+        <button class="google-btn" onclick="handleGoogleSignIn()">
+          <svg class="google-icon" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+            <g fill="none" fill-rule="evenodd">
+              <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+              <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+              <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+            </g>
+          </svg>
+          Sign in with Google
+        </button>
+
+        <div class="divider">
+          <span>or</span>
+        </div>
+        
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" />
+        </div>
+        
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" />
+        </div>
+        
+        <div class="modal-actions">
+          <button class="btn secondary" onclick="closeAuthModal()">Cancel</button>
+          <button class="btn" onclick="handleEmailLogin()">Sign In</button>
+        </div>
+        
+        <button class="link-btn" onclick="switchToSignup()">Don't have an account? Sign up</button>
+      </div>
+
+      <div id="signupForm" style="display:none;">
+        <h2>Create Account</h2>
+        <p>Join InjuryIntel to track your workout progress and prevent injuries</p>
+        
+        <!-- GOOGLE SIGN-IN BUTTON -->
+        <button class="google-btn" onclick="handleGoogleSignIn()">
+          <svg class="google-icon" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+            <g fill="none" fill-rule="evenodd">
+              <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+              <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+              <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+            </g>
+          </svg>
+          Sign up with Google
+        </button>
+
+        <div class="divider">
+          <span>or</span>
+        </div>
+        
+        <div class="form-group">
+          <label for="signupName">Full Name</label>
+          <input type="text" id="signupName" placeholder="John Doe" />
+        </div>
+        
+        <div class="form-group">
+          <label for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" placeholder="you@example.com" />
+        </div>
+        
+        <div class="form-group">
+          <label for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" placeholder="••••••••" />
+        </div>
+        
+        <div class="modal-actions">
+          <button class="btn secondary" onclick="closeAuthModal()">Cancel</button>
+          <button class="btn" onclick="handleEmailSignup()">Create Account</button>
+        </div>
+        
+        <button class="link-btn" onclick="switchToLogin()">Already have an account? Sign in</button>
+      </div>
+    </div>
+  </div>
+
   <main class="container" role="main" aria-labelledby="pageTitle">
     <div class="brand">
-      <div class="logo" title="Form Checker">
+      <div class="logo" title="InjuryIntel">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="white" opacity="0.08"/><rect x="5.5" y="10.2" width="13" height="3.6" rx="1.8" fill="#fff" opacity="0.9"/></svg>
       </div>
       <div class="title">
-        <h1 id="pageTitle">Workout Form Checker</h1>
-        <p>Clear, actionable guidance to keep training safe and effective</p>
+        <h1 id="pageTitle">Workout InjuryIntel</h1>
+        <p>AI-powered workout injury analysis with memory-enhanced insights</p>
       </div>
 
-      <div class="header-controls" role="toolbar" aria-label="Theme and quick actions">
-        <button id="themeToggle" class="theme-toggle" aria-pressed="false"><span id="themeIcon">☀️</span> <span id="themeLabel">Light</span></button>
+      <div class="header-controls" role="toolbar" aria-label="Theme and user actions">
+        <button id="themeToggle" class="theme-toggle" aria-pressed="false">
+          <span id="themeIcon">☀️</span> <span id="themeLabel">Light</span>
+        </button>
+        
+        <!-- User Profile or Login Button -->
+        <div id="authSection">
+          <button class="btn" onclick="openAuthModal()">Sign In</button>
+        </div>
       </div>
     </div>
 
-    <section class="card input-area" aria-labelledby="describeHeading">
-      <h2 id="describeHeading">Describe what happened</h2>
-      <p class="hint">Be specific about the exercise, movement, when pain occurred, and which side is affected.</p>
-
-      <textarea id="userInput" placeholder="E.g. Squats — felt a sharp twinge ..." aria-label="Describe your workout issue"></textarea>
-
-      <div class="suggestions" id="suggestions">
-        <button class="chip" data-sample="Squats — pain behind the knee on ascent">Squat — behind knee</button>
-        <button class="chip" data-sample="Deadlift — lower back stiffness next day">Deadlift — lower back</button>
-        <button class="chip" data-sample="Bench press — shoulder ache while lowering">Bench — shoulder ache</button>
-        <button class="chip" data-sample="Lunge — sharp pain in front of knee">Lunge — front knee</button>
-      </div>
-
-      <div class="controls" role="group" aria-label="actions">
-        <button id="runMasterBtn" class="btn" onclick="runMasterAndShow()">Generate Analysis Report</button>
-        <button id="clearBtn" class="btn secondary" onclick="clearInput()">Clear</button>
-      </div>
-
-      <div id="output" aria-live="polite"></div>
+    <!-- MAIN CONTENT AREA - Shows locked state or actual content based on auth -->
+    <section class="card input-area" aria-labelledby="describeHeading" id="mainContent">
+      <!-- This will be populated by JavaScript based on auth state -->
     </section>
 
     <aside class="panel" aria-labelledby="panelHeading">
@@ -125,7 +500,15 @@
         </ul>
       </div>
 
-      <!-- References Section (replaces "When to see a clinician") -->
+      <!-- History Section -->
+      <div class="mini" id="historyPanel">
+        <strong style="color:var(--text);font-size:15px;">🕐 Recent History</strong>
+        <div id="historyContent" style="margin-top:12px;">
+          <div class="empty-state">Sign in to see your analysis history</div>
+        </div>
+      </div>
+
+      <!-- References Section -->
       <div class="mini" id="referencesPanel">
         <strong style="color:var(--text);font-size:15px;">📚 References</strong>
         <div id="referencesContent" style="margin-top:8px;font-size:13px;color:var(--muted)">
@@ -133,7 +516,7 @@
         </div>
       </div>
 
-      <!-- Summary Section (replaces "System Overview") -->
+      <!-- Summary Section -->
       <div class="mini" id="summaryPanel">
         <strong style="color:var(--text);font-size:15px;">📊 Summary</strong>
         <div id="summaryContent" style="margin-top:8px;font-size:13px;color:var(--muted)">
@@ -145,15 +528,475 @@
   </main>
 
   <script>
-    // -- theme code (keeps previous behavior) --
+    // ==================== STATE MANAGEMENT ====================
+    const AppState = {
+      user: null,
+      history: [],
+      isAuthenticated: false
+    };
+
+    // ==================== LOCAL STORAGE HELPERS ====================
+    function saveToLocalStorage(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (e) {
+        console.error('Failed to save to localStorage:', e);
+      }
+    }
+
+    function loadFromLocalStorage(key) {
+      try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : null;
+      } catch (e) {
+        console.error('Failed to load from localStorage:', e);
+        return null;
+      }
+    }
+
+    // ==================== AUTH FUNCTIONS ====================
+    function openAuthModal() {
+      document.getElementById('authModal').classList.add('show');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('authModal').classList.remove('show');
+    }
+
+    function switchToSignup() {
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('signupForm').style.display = 'block';
+    }
+
+    function switchToLogin() {
+      document.getElementById('loginForm').style.display = 'block';
+      document.getElementById('signupForm').style.display = 'none';
+    }
+
+    // MOCK GOOGLE SIGN-IN
+    function handleGoogleSignIn() {
+      // Simulate Google OAuth with a simple prompt
+      const email = prompt('Enter your Gmail address:');
+      if (!email) return;
+
+      if (!email.includes('@')) {
+        flashNotice('Please enter a valid email');
+        return;
+      }
+
+      // Extract name from email (simple mock)
+      const name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+      // Check if user exists
+      const users = loadFromLocalStorage('users') || {};
+      
+      if (users[email]) {
+        // Existing user - auto login
+        AppState.user = users[email];
+      } else {
+        // New user - auto create account
+        const newUser = {
+          name: name,
+          email: email,
+          provider: 'google',
+          createdAt: new Date().toISOString()
+        };
+        users[email] = newUser;
+        saveToLocalStorage('users', users);
+        AppState.user = newUser;
+      }
+
+      AppState.isAuthenticated = true;
+      saveToLocalStorage('currentUser', AppState.user);
+      
+      loadUserHistory();
+      updateUIAfterLogin();
+      closeAuthModal();
+      flashNotice(`Welcome, ${AppState.user.name}! 🎉`);
+    }
+
+    function handleEmailLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      if (!email || !password) {
+        flashNotice('Please fill in all fields');
+        return;
+      }
+
+      // Check if user exists
+      const users = loadFromLocalStorage('users') || {};
+      if (users[email] && users[email].password === password) {
+        AppState.user = users[email];
+        AppState.isAuthenticated = true;
+        saveToLocalStorage('currentUser', AppState.user);
+        
+        loadUserHistory();
+        updateUIAfterLogin();
+        closeAuthModal();
+        flashNotice(`Welcome back, ${AppState.user.name}!`);
+      } else {
+        flashNotice('Invalid email or password');
+      }
+    }
+
+    function handleEmailSignup() {
+      const name = document.getElementById('signupName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const password = document.getElementById('signupPassword').value;
+
+      if (!name || !email || !password) {
+        flashNotice('Please fill in all fields');
+        return;
+      }
+
+      // Check if user already exists
+      const users = loadFromLocalStorage('users') || {};
+      if (users[email]) {
+        flashNotice('Account already exists. Please sign in.');
+        return;
+      }
+
+      // Create new user
+      const newUser = {
+        name: name,
+        email: email,
+        password: password,
+        provider: 'email',
+        createdAt: new Date().toISOString()
+      };
+
+      users[email] = newUser;
+      saveToLocalStorage('users', users);
+
+      // Auto-login after signup
+      AppState.user = newUser;
+      AppState.isAuthenticated = true;
+      saveToLocalStorage('currentUser', newUser);
+
+      updateUIAfterLogin();
+      closeAuthModal();
+      flashNotice(`Account created! Welcome, ${name}!`);
+    }
+
+    function handleLogout() {
+      AppState.user = null;
+      AppState.isAuthenticated = false;
+      AppState.history = [];
+      saveToLocalStorage('currentUser', null);
+      
+      // CLEAR REFERENCES AND SUMMARY
+      document.getElementById('referencesContent').innerHTML = 
+        'Run an analysis to see research sources...';
+      
+      document.getElementById('summaryContent').innerHTML = 
+        'Run an analysis to see key findings...';
+      
+      // CLEAR OUTPUT AREA
+      const outputEl = document.getElementById('output');
+      if (outputEl) outputEl.innerHTML = '';
+
+      updateUIAfterLogout();
+      flashNotice('Signed out successfully');
+    }
+
+    function updateUIAfterLogin() {
+      const authSection = document.getElementById('authSection');
+      const initials = AppState.user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+      
+      authSection.innerHTML = `
+        <div class="user-profile" onclick="toggleUserDropdown()">
+          <div class="user-avatar">${initials}</div>
+          <span style="font-size:14px;color:var(--text)">${AppState.user.name.split(' ')[0]}</span>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="dropdown-item" onclick="viewProfile()">
+              👤 Profile
+            </div>
+            <div class="dropdown-item" onclick="viewAllHistory()">
+              🕐 Full History
+            </div>
+            <div class="dropdown-item" onclick="handleLogout()">
+              🚪 Sign Out
+            </div>
+          </div>
+        </div>
+      `;
+
+      renderMainContent();
+      renderHistory();
+    }
+
+    function updateUIAfterLogout() {
+      const authSection = document.getElementById('authSection');
+      authSection.innerHTML = `<button class="btn" onclick="openAuthModal()">Sign In</button>`;
+      
+      renderMainContent(); // Show locked state
+      
+      const historyContent = document.getElementById('historyContent');
+      historyContent.innerHTML = '<div class="empty-state">Sign in to see your analysis history</div>';
+    }
+
+    function toggleUserDropdown() {
+      const dropdown = document.getElementById('userDropdown');
+      dropdown.classList.toggle('show');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.user-profile')) {
+        const dropdown = document.getElementById('userDropdown');
+        if (dropdown) dropdown.classList.remove('show');
+      }
+    });
+
+    function viewProfile() {
+      flashNotice('Profile page coming soon!');
+    }
+
+    function viewAllHistory() {
+      flashNotice('Full history view coming soon!');
+    }
+
+    // ==================== RENDER MAIN CONTENT ====================
+    let currentConversationId = null;
+
+    function renderMainContent() {
+      const mainContent = document.getElementById('mainContent');
+
+      if (!AppState.isAuthenticated) {
+        mainContent.innerHTML = `
+          <div class="locked-overlay">
+            <div class="lock-icon">🔒</div>
+            <h3>Sign In Required</h3>
+            <p>Please sign in to access workout injury chat assistant</p>
+            <button class="btn" onclick="openAuthModal()" style="min-width:200px">Sign In with Google</button>
+          </div>
+        `;
+        return;
+      }
+
+      mainContent.innerHTML = `
+        <div id="chatContainer" class="card" style="display:flex;flex-direction:column;height:70vh;">
+          <div id="chatMessages" style="flex:1;overflow-y:auto;padding:12px;border-radius:8px;background:var(--card-bg);border:1px solid rgba(0,0,0,0.06);margin-bottom:12px;"></div>
+          <div style="display:flex;gap:8px;">
+            <input id="chatInput" type="text" placeholder="Describe your issue..." 
+                  style="flex:1;padding:12px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:var(--card-bg);color:var(--text);font-size:15px;" 
+                  onkeypress="if(event.key==='Enter'){sendChatMessage();}">
+            <button class="btn" onclick="sendChatMessage()">Send</button>
+            <button class="btn secondary" onclick="startNewConversation()">New</button>
+          </div>
+        </div>
+      `;
+
+      // Start new conversation automatically
+      startNewConversation();
+    }
+
+    // ==================== CHAT LOGIC ====================
+    async function startNewConversation() {
+      try {
+        const resp = await fetch('/chat/reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ conversation_id: currentConversationId })
+        });
+        const data = await resp.json();
+        currentConversationId = null;
+        document.getElementById('chatMessages').innerHTML = '';
+        appendMessage('system', '🩺 New session started. How can I assist you today?');
+      } catch (e) {
+        appendMessage('system', 'Failed to start a new session.');
+      }
+    }
+
+    async function sendChatMessage() {
+      const inputEl = document.getElementById('chatInput');
+      const text = inputEl.value.trim();
+      if (!text) return;
+      appendMessage('user', text);
+      inputEl.value = '';
+
+      try {
+        const resp = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: text,
+            conversation_id: currentConversationId,
+            userId: AppState.user?.email || null
+          })
+        });
+        const data = await resp.json();
+
+        if (data.ok) {
+          if (!currentConversationId) currentConversationId = data.conversation_id;
+
+          if (data.type === 'question') {
+            appendMessage('assistant', data.question || '(clarification requested)');
+          } else if (data.type === 'complete') {
+            const pretty = JSON.stringify(data.result, null, 2);
+            appendMessage('assistant', `<pre>${escapeHtml(pretty)}</pre>`);
+          } else {
+            appendMessage('assistant', 'Unexpected response type.');
+          }
+        } else {
+          appendMessage('assistant', 'Error: ' + (data.error || 'unknown'));
+        }
+      } catch (err) {
+        appendMessage('assistant', 'Request failed: ' + err.message);
+      }
+    }
+
+    function appendMessage(role, text) {
+      const chat = document.getElementById('chatMessages');
+      if (!chat) return;
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `chat-message ${role}`;
+      msgDiv.innerHTML = escapeHtml(text);
+      chat.appendChild(msgDiv);
+      chat.scrollTop = chat.scrollHeight;
+      sgDiv.style.margin = '8px 0';
+      msgDiv.style.padding = '10px 12px';
+      msgDiv.style.borderRadius = '10px';
+      msgDiv.style.maxWidth = '85%';
+      msgDiv.style.whiteSpace = 'pre-wrap';
+      msgDiv.style.lineHeight = '1.5';
+
+      if (role === 'user') {
+        msgDiv.style.background = 'var(--accent)';
+        msgDiv.style.color = 'white';
+        msgDiv.style.marginLeft = 'auto';
+      } else if (role === 'assistant') {
+        msgDiv.style.background = 'rgba(0,0,0,0.05)';
+        msgDiv.style.color = 'var(--text)';
+      } else {
+        msgDiv.style.fontStyle = 'italic';
+        msgDiv.style.color = 'var(--muted)';
+        msgDiv.style.textAlign = 'center';
+      }
+
+      msgDiv.innerHTML = escapeHtml(text);
+      chat.appendChild(msgDiv);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+
+    // ==================== MEMORY / HISTORY FUNCTIONS ====================
+    function saveAnalysisToHistory(query, result) {
+      if (!AppState.isAuthenticated) return;
+
+      const historyItem = {
+        id: Date.now(),
+        userId: AppState.user.email,
+        query: query,
+        result: result,
+        timestamp: new Date().toISOString()
+      };
+
+      const allHistory = loadFromLocalStorage('analysisHistory') || [];
+      allHistory.unshift(historyItem);
+
+      const userHistory = allHistory.filter(h => h.userId === AppState.user.email).slice(0, 50);
+      const otherHistory = allHistory.filter(h => h.userId !== AppState.user.email);
+      
+      saveToLocalStorage('analysisHistory', [...userHistory, ...otherHistory]);
+      
+      loadUserHistory();
+      renderHistory();
+    }
+
+    function loadUserHistory() {
+      if (!AppState.isAuthenticated) {
+        AppState.history = [];
+        return;
+      }
+
+      const allHistory = loadFromLocalStorage('analysisHistory') || [];
+      AppState.history = allHistory
+        .filter(h => h.userId === AppState.user.email)
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 10);
+    }
+
+    function renderHistory() {
+      const historyContent = document.getElementById('historyContent');
+
+      if (!AppState.isAuthenticated) {
+        historyContent.innerHTML = '<div class="empty-state">Sign in to see your analysis history</div>';
+        return;
+      }
+
+      if (AppState.history.length === 0) {
+        historyContent.innerHTML = '<div class="empty-state">No analyses yet. Start by describing a workout issue!</div>';
+        return;
+      }
+
+      let historyHTML = '';
+      AppState.history.forEach(item => {
+        const date = new Date(item.timestamp);
+        const timeAgo = getTimeAgo(date);
+        const preview = item.query.substring(0, 60) + (item.query.length > 60 ? '...' : '');
+
+        historyHTML += `
+          <div class="history-item" onclick="loadHistoryItem(${item.id})">
+            <div class="history-item-header">
+              <div class="history-item-title">${escapeHtml(preview)}</div>
+              <div class="history-item-date">${timeAgo}</div>
+            </div>
+            <div class="history-item-preview">
+              ${item.result.parsed_data ? escapeHtml(item.result.parsed_data.exercise || 'Analysis') : 'Analysis'}
+            </div>
+          </div>
+        `;
+      });
+
+      historyContent.innerHTML = historyHTML;
+    }
+
+    function loadHistoryItem(id) {
+      const item = AppState.history.find(h => h.id === id);
+      if (!item) return;
+
+      document.getElementById('userInput').value = item.query;
+      
+      const outEl = document.getElementById('output');
+      const pretty = JSON.stringify(item.result, null, 2);
+      outEl.innerHTML = `
+        <div class="result-card">
+          <div style="font-weight:700;font-size:15px;color:var(--text)">Previous Analysis</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">From ${new Date(item.timestamp).toLocaleString()}</div>
+          <pre style="margin-top:10px;white-space:pre-wrap;color:var(--muted)">${escapeHtml(pretty)}</pre>
+        </div>
+      `;
+
+      if (item.result) {
+        updateSidebar(item.result);
+      }
+
+      flashNotice('Loaded from history');
+    }
+
+    function getTimeAgo(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      
+      if (seconds < 60) return 'just now';
+      if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
+      if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
+      if (seconds < 604800) return Math.floor(seconds / 86400) + 'd ago';
+      return date.toLocaleDateString();
+    }
+
+    // ==================== THEME MANAGEMENT ====================
     const themeToggleBtn = document.getElementById('themeToggle');
     const themeLabel = document.getElementById('themeLabel');
     const themeIcon = document.getElementById('themeIcon');
+    
     (function initTheme(){
-      const stored = (function(){ try { return localStorage.getItem('preferredTheme'); } catch(e){ return null; }})();
+      const stored = loadFromLocalStorage('preferredTheme');
       const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       const initial = stored || (systemPrefersDark ? 'dark' : 'light');
       applyTheme(initial, false);
+      
       themeToggleBtn && themeToggleBtn.addEventListener('click', () => {
         const current = document.documentElement.getAttribute('data-theme') || 'light';
         const next = current === 'dark' ? 'light' : 'dark';
@@ -161,52 +1004,34 @@
       });
     })();
 
-    function applyTheme(theme, persist){
-      if(theme === 'dark'){
-        document.documentElement.setAttribute('data-theme','dark');
-        themeLabel.textContent = 'Dark';
-        themeIcon.textContent = '🌙';
-        themeToggleBtn && themeToggleBtn.setAttribute('aria-pressed','true');
-      } else {
-        document.documentElement.setAttribute('data-theme','light');
-        themeLabel.textContent = 'Light';
-        themeIcon.textContent = '☀️';
-        themeToggleBtn && themeToggleBtn.setAttribute('aria-pressed','false');
-      }
-      if(persist){
-        try { localStorage.setItem('preferredTheme', theme); } catch(e) {}
-      }
+    function applyTheme(t, save){
+      document.documentElement.setAttribute('data-theme', t);
+      if(themeIcon) themeIcon.textContent = t === 'dark' ? '🌙' : '☀️';
+      if(themeLabel) themeLabel.textContent = t === 'dark' ? 'Dark' : 'Light';
+      if(save) saveToLocalStorage('preferredTheme', t);
     }
 
-    // -- existing analysis UI wiring (kept as-is) --
-    const analyzeBtn = document.getElementById('analyzeBtn');
-    const runMasterBtn = document.getElementById('runMasterBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const userInput = document.getElementById('userInput');
+    // ==================== MAIN ANALYSIS FUNCTION ====================
     const output = document.getElementById('output');
-    const progressFill = document.getElementById('progressFill');
-
-    document.getElementById('suggestions').addEventListener('click', (e) => {
-      const btn = e.target.closest('.chip');
-      if(!btn) return;
-      userInput.value = btn.dataset.sample || btn.textContent;
-      userInput.focus();
-    });
 
     function clearInput(){
-      userInput.value = '';
-      output.innerHTML = '';
+      const userInput = document.getElementById('userInput');
+      if (userInput) userInput.value = '';
+      
+      const output = document.getElementById('output');
+      if (output) output.innerHTML = '';
+      
       updateProgress(0);
-      // Reset sidebar panels
-      document.getElementById('referencesContent').innerHTML = 'Run an analysis to see research sources...';
-      document.getElementById('summaryContent').innerHTML = 'Run an analysis to see key findings...';
     }
+
     function setBtnState(isBusy){
-      if(analyzeBtn) analyzeBtn.disabled = isBusy;
-      runMasterBtn.disabled = isBusy;
-      clearBtn.disabled = isBusy;
-      if(analyzeBtn) analyzeBtn.textContent = isBusy ? 'Analyzing…' : 'Analyze';
+      const runMasterBtn = document.getElementById('runMasterBtn');
+      const clearBtn = document.getElementById('clearBtn');
+      
+      if (runMasterBtn) runMasterBtn.disabled = isBusy;
+      if (clearBtn) clearBtn.disabled = isBusy;
     }
+
     function updateProgress(p){
       const f = document.getElementById('progressFill');
       if(f) f.style.width = p + '%';
@@ -217,6 +1042,8 @@
     function animateProgress(duration = 4000) {
       const bar = document.getElementById("progressFill");
       const percentText = document.getElementById("progressPercent");
+      if (!bar || !percentText) return;
+      
       let startTime = null;
 
       function step(timestamp) {
@@ -233,9 +1060,7 @@
       requestAnimationFrame(step);
     }
 
-    // NEW: Function to populate sidebar with analysis results
     function updateSidebar(result) {
-      // Update References
       const referencesContent = document.getElementById('referencesContent');
       const webResults = result.web_results || [];
       const sources = result.web_sources || [];
@@ -258,14 +1083,12 @@
         referencesContent.innerHTML = 'No external sources found in this analysis.';
       }
 
-      // Update Summary
       const summaryContent = document.getElementById('summaryContent');
       const diagnosis = result.diagnosis || 'Not available';
       const parsedData = result.parsed_data || {};
       const exercise = parsedData.exercise || 'Unknown';
       const painLocation = parsedData.pain_location || 'Unknown';
       
-      // Extract first line of diagnosis for brevity
       const diagnosisShort = diagnosis.split('\n')[0].substring(0, 120) + '...';
       
       const summaryHTML = `
@@ -286,18 +1109,38 @@
     }
 
     async function runMasterAndShow(){
+      if (!AppState.isAuthenticated) {
+        flashNotice('Please sign in first');
+        openAuthModal();
+        return;
+      }
+
       setBtnState(true);
-      const outEl = output;
-      outEl.innerHTML = `<div class="result-card">Running master.py… <span style="opacity:.7">This uses the server import path by default (fastest). If import fails, server will run subprocess fallback.</span></div>`;
+      const outEl = document.getElementById('output');
+      if (!outEl) return;
+      
+      outEl.innerHTML = `<div class="result-card">Running analysis… <span style="opacity:.7">Processing your workout injury report with AI agents.</span></div>`;
       const progressPromise = animateProgress(17500);
       
       try {
-        const userInputText = document.getElementById("userInput").value.trim();
+        const userInput = document.getElementById("userInput");
+        if (!userInput) return;
         
+        const userInputText = userInput.value.trim();
+        
+        if (!userInputText) {
+          flashNotice('Please describe your workout issue first');
+          setBtnState(false);
+          return;
+        }
+
         const resp = await fetch('https://rebeca-groutiest-incorporeally.ngrok-free.dev/run', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ input: userInputText })
+          body: JSON.stringify({ 
+            input: userInputText,
+            userId: AppState.user ? AppState.user.email : null
+          })
         });
 
         const data = await resp.json();
@@ -307,36 +1150,26 @@
           const pretty = data.printed || JSON.stringify(data.result, null, 2);
           outEl.innerHTML = `
             <div class="result-card">
-              <div style="font-weight:700;font-size:15px;color:var(--text)">Master.py Console Output</div>
+              <div style="font-weight:700;font-size:15px;color:var(--text)">Analysis Complete</div>
               <pre style="margin-top:10px;white-space:pre-wrap;color:var(--muted)">${escapeHtml(pretty)}</pre>
             </div>
           `;
           
-          // NEW: Update sidebar with results
           if (data.result) {
             updateSidebar(data.result);
+            
+            if (AppState.isAuthenticated) {
+              saveAnalysisToHistory(userInputText, data.result);
+            }
           }
         } else {
           const body = data.output && data.output.length ? data.output : '(no output)';
           outEl.innerHTML = `
-            <div class="result-card" id="analysisCard">
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <div style="font-weight:700;font-size:15px;color:var(--text)">master.py output</div>
-                <div style="font-size:12px;color:var(--muted)">${escapeHtml((data.elapsed_ms||0) + 'ms')}</div>
-              </div>
-              <pre id="masterOutput" style="margin-top:10px;color:var(--muted);white-space:pre-wrap">${escapeHtml(body)}</pre>
-              <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
-                <button id="copyBtn" class="btn secondary" style="min-width:84px">Copy</button>
-                <button id="saveBtn" class="btn" style="min-width:84px">Save</button>
-              </div>
+            <div class="result-card">
+              <div style="font-weight:700;font-size:15px;color:var(--text)">Analysis Output</div>
+              <pre style="margin-top:10px;color:var(--muted);white-space:pre-wrap">${escapeHtml(body)}</pre>
             </div>
           `;
-          document.getElementById('copyBtn').addEventListener('click', async () => {
-            try { await navigator.clipboard.writeText(body); flashNotice('Copied to clipboard'); } catch(e){ flashNotice('Unable to copy'); }
-          });
-          document.getElementById('saveBtn').addEventListener('click', () => {
-            try { localStorage.setItem('lastPlan', body); flashNotice('Saved locally'); } catch(e){ flashNotice('Unable to save'); }
-          });
         }
       } catch (err) {
         outEl.innerHTML = `<div class="result-card">Request failed: ${escapeHtml(err.message || String(err))}</div>`;
@@ -346,18 +1179,53 @@
       }
     }
 
-    function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+    function escapeHtml(s){ 
+      return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); 
+    }
+    
     function flashNotice(msg){
-      const t = document.createElement('div'); t.className='toast'; t.textContent = msg; document.body.appendChild(t);
-      setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateY(6px)'; }, 1400);
+      const t = document.createElement('div'); 
+      t.className='toast'; 
+      t.textContent = msg; 
+      document.body.appendChild(t);
+      setTimeout(()=>{ 
+        t.style.opacity='0'; 
+        t.style.transform='translateY(6px)'; 
+      }, 1400);
       setTimeout(()=> t.remove(), 2200);
     }
 
-    // Initialize small UI state
-    (function init(){ updateProgress(0); })();
-    // Expose functions for inline handlers
+    // ==================== INITIALIZATION ====================
+    (function init(){ 
+      updateProgress(0);
+      
+      // Check if user is already logged in
+      const currentUser = loadFromLocalStorage('currentUser');
+      if (currentUser && currentUser.email) {
+        AppState.user = currentUser;
+        AppState.isAuthenticated = true;
+        loadUserHistory();
+        updateUIAfterLogin();
+      } else {
+        renderMainContent(); // Show locked state
+      }
+    })();
+
+    // Expose functions
     window.clearInput = clearInput;
     window.runMasterAndShow = runMasterAndShow;
+    window.openAuthModal = openAuthModal;
+    window.closeAuthModal = closeAuthModal;
+    window.switchToSignup = switchToSignup;
+    window.switchToLogin = switchToLogin;
+    window.handleGoogleSignIn = handleGoogleSignIn;
+    window.handleEmailLogin = handleEmailLogin;
+    window.handleEmailSignup = handleEmailSignup;
+    window.handleLogout = handleLogout;
+    window.toggleUserDropdown = toggleUserDropdown;
+    window.viewProfile = viewProfile;
+    window.viewAllHistory = viewAllHistory;
+    window.loadHistoryItem = loadHistoryItem;
   </script>
 </body>
 </html>
