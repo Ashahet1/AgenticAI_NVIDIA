@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Workout InjuryIntel</title>
+  <title>Workout InjuryIntel - Chat</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
@@ -16,54 +16,65 @@
       --accent: #2b6cb0;
       --accent-2: #7c3aed;
       --radius: 12px;
-      --base-size: 18px;
       --shadow-1: 0 8px 24px rgba(2,6,23,0.06);
     }
-    html[data-theme="dark"] {
-      --bg: #0b1220;
-      --card-bg: rgba(255,255,255,0.03);
-      --text: #e6eef8;
-      --muted: #cbd5e1;
-      --accent: #60a5fa;
-      --accent-2: #7c3aed;
-    }
 
-    html { font-size: var(--base-size); }
+    * { box-sizing: border-box; }
+    html { font-size: 18px; }
     body {
-      margin: 0; padding: 32px;
+      margin: 0;
+      padding: 0;
       font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-      background: var(--bg); color: var(--text);
-      min-height:100vh; display:flex; justify-content:center; align-items:flex-start;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
-    .container { width:100%; max-width:980px; display:grid; grid-template-columns: 1fr 360px; gap:24px; }
-    .brand { grid-column:1/-1; display:flex; gap:14px; align-items:center; margin-bottom:6px; }
-    .logo { width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,var(--accent),var(--accent-2)); box-shadow:var(--shadow-1); }
-    .title h1{font-size:20px;margin:0 0 2px 0}
-    .title p{margin:0;color:var(--muted);font-size:13px}
-    .header-controls{margin-left:auto;display:flex;gap:10px;align-items:center}
-    .theme-toggle{padding:8px 10px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:transparent;cursor:pointer}
-    .card{border-radius:12px;padding:18px;background:var(--card-bg);box-shadow:var(--shadow-1);border:1px solid rgba(0,0,0,0.04)}
-    textarea{width:100%;min-height:80px;padding:14px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:var(--card-bg);color:var(--text)}
-    .controls{display:flex;gap:10px;margin-top:12px}
-    .btn{background: linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;padding:12px 16px;border-radius:10px;border:none;cursor:pointer;min-height:44px;font-weight:600}
-    .btn.secondary{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--muted)}
-    .suggestions { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px }
-    .chip{padding:8px 10px;border-radius:999px;border:1px solid rgba(0,0,0,0.06);background:transparent;color:var(--muted);cursor:pointer}
-    .panel{display:flex;flex-direction:column;gap:14px}
-    .mini{padding:12px;border-radius:10px;background:var(--card-bg);border:1px solid rgba(0,0,0,0.04);color:var(--muted)}
-    .progress-bar{width:100%;height:12px;border-radius:999px;background:rgba(0,0,0,0.04);overflow:hidden}
-    .progress-bar > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .48s}
-    .result-card{margin-top:12px;background:var(--card-bg);padding:12px;border-radius:10px;border:1px solid rgba(0,0,0,0.04);white-space:pre-wrap;color:var(--muted)}
-    .typing::after{content:'▍';margin-left:6px;color:var(--accent);animation:blink 1s steps(2,end) infinite}
-    @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
-    .toast{position:fixed;right:20px;bottom:20px;padding:10px 14px;border-radius:10px;color:#fff;background:linear-gradient(90deg,var(--accent),var(--accent-2));box-shadow:var(--shadow-1);z-index:9999}
-    .reference-link{display:block;padding:6px 0;color:var(--accent);text-decoration:none;font-size:13px;line-height:1.4;border-bottom:1px solid rgba(0,0,0,0.04)}
-    .reference-link:hover{text-decoration:underline}
-    .reference-link:last-child{border-bottom:none}
-    .summary-item{margin-bottom:8px;font-size:13px;line-height:1.5}
-    .summary-label{font-weight:600;color:var(--text);display:inline-block;min-width:90px}
 
-    /* USER PROFILE & AUTH STYLES */
+    .header {
+      background: var(--card-bg);
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      box-shadow: var(--shadow-1);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    .header-title h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .header-title p {
+      margin: 2px 0 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .header-controls {
+      margin-left: auto;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
     .user-profile {
       display: flex;
       align-items: center;
@@ -75,6 +86,7 @@
       cursor: pointer;
       position: relative;
     }
+
     .user-avatar {
       width: 32px;
       height: 32px;
@@ -87,6 +99,7 @@
       font-weight: 700;
       font-size: 14px;
     }
+
     .user-dropdown {
       position: absolute;
       top: 50px;
@@ -99,17 +112,19 @@
       z-index: 1000;
       display: none;
     }
+
     .user-dropdown.show { display: block; }
+
     .dropdown-item {
       padding: 12px 16px;
       cursor: pointer;
       border-bottom: 1px solid rgba(0,0,0,0.04);
       font-size: 14px;
     }
+
     .dropdown-item:hover { background: rgba(0,0,0,0.02); }
     .dropdown-item:last-child { border-bottom: none; }
 
-    /* MODAL STYLES */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -123,7 +138,9 @@
       z-index: 2000;
       backdrop-filter: blur(4px);
     }
+
     .modal-overlay.show { display: flex; }
+
     .modal {
       background: var(--card-bg);
       border-radius: 16px;
@@ -132,18 +149,19 @@
       width: 90%;
       box-shadow: 0 20px 60px rgba(0,0,0,0.2);
     }
+
     .modal h2 {
       margin: 0 0 8px 0;
       font-size: 24px;
       color: var(--text);
     }
+
     .modal p {
       margin: 0 0 24px 0;
       color: var(--muted);
       font-size: 14px;
     }
 
-    /* GOOGLE SIGN-IN BUTTON */
     .google-btn {
       width: 100%;
       display: flex;
@@ -162,16 +180,17 @@
       transition: all 0.2s;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
+
     .google-btn:hover {
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       border-color: #d2d3d4;
     }
+
     .google-icon {
       width: 18px;
       height: 18px;
     }
 
-    /* DIVIDER */
     .divider {
       display: flex;
       align-items: center;
@@ -180,12 +199,14 @@
       color: var(--muted);
       font-size: 13px;
     }
+
     .divider::before,
     .divider::after {
       content: '';
       flex: 1;
       border-bottom: 1px solid rgba(0,0,0,0.06);
     }
+
     .divider span {
       padding: 0 12px;
     }
@@ -193,6 +214,7 @@
     .form-group {
       margin-bottom: 16px;
     }
+
     .form-group label {
       display: block;
       margin-bottom: 6px;
@@ -200,6 +222,7 @@
       font-size: 14px;
       color: var(--text);
     }
+
     .form-group input {
       width: 100%;
       padding: 12px;
@@ -209,14 +232,17 @@
       color: var(--text);
       font-size: 15px;
     }
+
     .modal-actions {
       display: flex;
       gap: 10px;
       margin-top: 24px;
     }
+
     .modal-actions .btn {
       flex: 1;
     }
+
     .link-btn {
       background: none;
       border: none;
@@ -231,311 +257,605 @@
       width: 100%;
     }
 
-    /* LOCKED STATE */
-    .locked-overlay {
+    .btn {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      min-height: 44px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .btn.secondary {
+      background: transparent;
+      border: 1px solid rgba(0,0,0,0.06);
+      color: var(--muted);
+    }
+
+    .main-container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 280px 1fr 360px;
+      overflow: hidden;
+      height: calc(100vh - 74px);
+      min-height: 0;
+    }
+
+    .history-sidebar {
+      background: var(--card-bg);
+      border-right: 1px solid rgba(0,0,0,0.04);
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .history-header {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 12px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .history-item {
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--muted);
+      border: 1px solid rgba(0,0,0,0.04);
+      background: var(--bg);
+      transition: all 0.2s;
+    }
+
+    .history-item:hover {
+      background: rgba(43, 108, 176, 0.05);
+      border-color: var(--accent);
+    }
+
+    .history-item-title {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-item-time {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .chat-section {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      border-right: 1px solid rgba(0,0,0,0.04);
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: scroll !important;
+      overflow-x: hidden;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      height: 100%;
+      max-height: calc(100vh - 200px);
+    }
+
+    .chat-messages::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.02);
+      border-radius: 10px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+      background: rgba(0,0,0,0.2);
+    }
+
+    .message {
+      max-width: 85%;
+      padding: 14px 18px;
+      border-radius: 16px;
+      line-height: 1.5;
+      font-size: 15px;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.agent {
+      align-self: flex-start;
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid rgba(0,0,0,0.04);
+      border-bottom-left-radius: 4px;
+      box-shadow: var(--shadow-1);
+      white-space: pre-wrap;
+    }
+
+    .message.system {
+      align-self: center;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 8px 12px;
+    }
+
+    .chat-input-area {
+      padding: 16px 24px;
+      background: var(--card-bg);
+      border-top: 1px solid rgba(0,0,0,0.04);
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.06);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      font-family: inherit;
+      resize: none;
+      max-height: 120px;
+      min-height: 44px;
+    }
+
+    .send-btn {
+      padding: 12px 24px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 15px;
+      min-height: 44px;
+      transition: opacity 0.2s;
+    }
+
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .new-btn {
+      padding: 10px 20px;
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .sidebar {
+      background: var(--card-bg);
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .sidebar-section {
+      background: var(--bg);
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .sidebar-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 12px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .agent-step {
+      padding: 8px 12px;
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      border-radius: 8px;
+      background: var(--card-bg);
+    }
+
+    .agent-step.active {
+      color: var(--accent);
+      background: rgba(43, 108, 176, 0.08);
+    }
+
+    .agent-step.completed {
+      color: #10b981;
+    }
+
+    .step-icon {
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .reference-link {
+      display: block;
+      padding: 8px 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .reference-link:last-child {
+      border-bottom: none;
+    }
+
+    .reference-link:hover {
+      text-decoration: underline;
+    }
+
+    .summary-item {
+      margin-bottom: 10px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .summary-label {
+      font-weight: 600;
+      color: var(--text);
+      display: inline-block;
+    }
+
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      padding: 8px 0;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+      animation: typing 1.4s infinite;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+      0%, 60%, 100% {
+        opacity: 0.3;
+        transform: translateY(0);
+      }
+      30% {
+        opacity: 1;
+        transform: translateY(-8px);
+      }
+    }
+
+    .empty-state {
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 60px 20px;
+      color: var(--muted);
       text-align: center;
-      min-height: 300px;
+      padding: 40px;
     }
-    .lock-icon {
+
+    .empty-state-icon {
       font-size: 48px;
       margin-bottom: 16px;
-      opacity: 0.3;
     }
-    .locked-overlay h3 {
+
+    .empty-state h2 {
       margin: 0 0 8px 0;
       font-size: 20px;
       color: var(--text);
     }
-    .locked-overlay p {
-      margin: 0 0 24px 0;
-      color: var(--muted);
-      font-size: 15px;
-      max-width: 400px;
+
+    .empty-state p {
+      margin: 0;
+      font-size: 14px;
     }
 
-    /* HISTORY STYLES */
-    .history-item {
-      padding: 12px;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.02);
-      margin-bottom: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .history-item:hover {
-      background: rgba(0,0,0,0.04);
-      transform: translateX(2px);
-    }
-    .history-item-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-    .history-item-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 200px;
-    }
-    .history-item-date {
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .history-item-preview {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.4;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .empty-state {
-      text-align: center;
-      padding: 24px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    /* CHAT UI STYLING */
-    #chatContainer {
+    .locked-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
       display: flex;
       flex-direction: column;
-      height: 70vh;
-      background: var(--card-bg);
-      border: 1px solid rgba(0,0,0,0.04);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-1);
-      padding: 16px;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(8px);
     }
 
-    #chatMessages {
-      flex: 1;
-      overflow-y: auto;
-      padding-right: 8px;
-      scroll-behavior: smooth;
+    .locked-icon {
+      font-size: 64px;
+      margin-bottom: 24px;
     }
 
-    #chatMessages::-webkit-scrollbar {
-      width: 8px;
-    }
-    #chatMessages::-webkit-scrollbar-thumb {
-      background: rgba(0,0,0,0.08);
-      border-radius: 8px;
-    }
-
-    .chat-message {
-      margin: 8px 0;
-      padding: 10px 12px;
-      border-radius: 10px;
-      max-width: 85%;
-      line-height: 1.5;
-      word-wrap: break-word;
-    }
-
-    .chat-message.user {
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      color: white;
-      margin-left: auto;
-    }
-
-    .chat-message.assistant {
-      background: rgba(0,0,0,0.05);
+    .locked-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
       color: var(--text);
     }
 
-    .chat-message.system {
-      font-style: italic;
+    .locked-subtitle {
+      font-size: 16px;
       color: var(--muted);
-      text-align: center;
+      margin-bottom: 24px;
     }
 
-    @media (max-width:980px){ 
-      .container{grid-template-columns:1fr} 
-      .header-controls{margin-left:0;flex-wrap:wrap} 
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      padding: 14px 18px;
+      border-radius: 10px;
+      color: #fff;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      box-shadow: var(--shadow-1);
+      z-index: 9999;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <!-- AUTH MODAL -->
-  <div id="authModal" class="modal-overlay">
+  <div class="header">
+    <div class="logo">💪</div>
+    <div class="header-title">
+      <h1>Workout InjuryIntel</h1>
+      <p>AI-powered injury analysis with conversational agents</p>
+    </div>
+    <div class="header-controls">
+      <button class="new-btn" onclick="newConversation()">New Chat</button>
+      
+      <div class="user-profile" id="userProfile" onclick="toggleUserDropdown()" style="display: none;">
+        <div class="user-avatar" id="userAvatar">U</div>
+        <span id="userName" style="font-size: 14px;">User</span>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="dropdown-item" onclick="viewProfile()">Profile</div>
+          <div class="dropdown-item" onclick="viewAllHistory()">History</div>
+          <div class="dropdown-item" onclick="handleLogout()">Sign Out</div>
+        </div>
+      </div>
+
+      <button class="btn" id="signInBtn" onclick="openAuthModal()">Sign In</button>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <div class="history-sidebar" id="historySidebar">
+      <div class="history-header">
+        <span>Recent Chats</span>
+      </div>
+      <div id="historyList">
+        <div style="color: var(--muted); font-size: 13px; padding: 20px 10px; text-align: center;">
+          Sign in to see your chat history
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-section">
+      <div id="chatContainer" style="position: relative; flex: 1; display: flex; flex-direction: column;">
+       <div class="locked-overlay" id="lockedOverlay">
+          <div class="locked-icon">🔒</div>
+          <h2 class="locked-title">Sign In Required</h2>
+          <p class="locked-subtitle">Please sign in to start analyzing your workout injuries</p>
+          <button class="btn" onclick="openAuthModal()">Sign In</button>
+        </div> 
+
+
+        <div class="chat-messages" id="chatMessages">
+          <div class="empty-state">
+            <div class="empty-state-icon">💬</div>
+            <h2>Start a Conversation</h2>
+            <p>Describe your workout injury or pain, and I'll help analyze it.</p>
+          </div>
+        </div>
+
+        <div class="chat-input-area">
+          <textarea 
+            class="chat-input" 
+            id="chatInput" 
+            placeholder="Describe your workout issue... (e.g., 'Sharp right knee pain during squats')"
+            rows="1"
+            disabled
+          ></textarea>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>Send</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">
+          <span>📊</span>
+          <span>Agent Pipeline</span>
+        </div>
+        <div id="agentSteps">
+          <div class="agent-step">
+            <span class="step-icon">💡</span>
+            <span>Initiate reasoning</span>
+          </div>
+          <div class="agent-step">
+            <span class="step-icon">📝</span>
+            <span>Parse input</span>
+          </div>
+          <div class="agent-step">
+            <span class="step-icon">🏃</span>
+            <span>Analyze form</span>
+          </div>
+          <div class="agent-step">
+            <span class="step-icon">🩺</span>
+            <span>Diagnose injury</span>
+          </div>
+          <div class="agent-step">
+            <span class="step-icon">🔍</span>
+            <span>Research evidence</span>
+          </div>
+          <div class="agent-step">
+            <span class="step-icon">📋</span>
+            <span>Create action plan</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">
+          <span>📚</span>
+          <span>References</span>
+        </div>
+        <div id="referencesContent" style="color: var(--muted); font-size: 13px;">
+          Run an analysis to see research sources...
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">
+          <span>📊</span>
+          <span>Summary</span>
+        </div>
+        <div id="summaryContent" style="color: var(--muted); font-size: 13px;">
+          Run an analysis to see key findings...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="authModal">
     <div class="modal">
       <div id="loginForm">
-        <h2>Welcome to InjuryIntel</h2>
-        <p>Sign in to analyze your workout injuries and track your progress</p>
-        
-        <!-- GOOGLE SIGN-IN BUTTON -->
+        <h2>Welcome Back</h2>
+        <p>Sign in to access your injury analysis history</p>
+
         <button class="google-btn" onclick="handleGoogleSignIn()">
-          <svg class="google-icon" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-            <g fill="none" fill-rule="evenodd">
-              <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-              <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
-              <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-            </g>
+          <svg class="google-icon" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>
           Sign in with Google
         </button>
 
-        <div class="divider">
-          <span>or</span>
-        </div>
-        
+        <div class="divider"><span>or</span></div>
+
         <div class="form-group">
-          <label for="loginEmail">Email</label>
-          <input type="email" id="loginEmail" placeholder="you@example.com" />
+          <label>Email</label>
+          <input type="email" id="loginEmail" placeholder="your@email.com" />
         </div>
-        
         <div class="form-group">
-          <label for="loginPassword">Password</label>
+          <label>Password</label>
           <input type="password" id="loginPassword" placeholder="••••••••" />
         </div>
-        
+
         <div class="modal-actions">
           <button class="btn secondary" onclick="closeAuthModal()">Cancel</button>
           <button class="btn" onclick="handleEmailLogin()">Sign In</button>
         </div>
-        
+
         <button class="link-btn" onclick="switchToSignup()">Don't have an account? Sign up</button>
       </div>
 
-      <div id="signupForm" style="display:none;">
+      <div id="signupForm" style="display: none;">
         <h2>Create Account</h2>
-        <p>Join InjuryIntel to track your workout progress and prevent injuries</p>
-        
-        <!-- GOOGLE SIGN-IN BUTTON -->
+        <p>Get started with personalized injury analysis</p>
+
         <button class="google-btn" onclick="handleGoogleSignIn()">
-          <svg class="google-icon" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-            <g fill="none" fill-rule="evenodd">
-              <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-              <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
-              <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-            </g>
+          <svg class="google-icon" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>
           Sign up with Google
         </button>
 
-        <div class="divider">
-          <span>or</span>
-        </div>
-        
+        <div class="divider"><span>or</span></div>
+
         <div class="form-group">
-          <label for="signupName">Full Name</label>
+          <label>Name</label>
           <input type="text" id="signupName" placeholder="John Doe" />
         </div>
-        
         <div class="form-group">
-          <label for="signupEmail">Email</label>
-          <input type="email" id="signupEmail" placeholder="you@example.com" />
+          <label>Email</label>
+          <input type="email" id="signupEmail" placeholder="your@email.com" />
         </div>
-        
         <div class="form-group">
-          <label for="signupPassword">Password</label>
+          <label>Password</label>
           <input type="password" id="signupPassword" placeholder="••••••••" />
         </div>
-        
+
         <div class="modal-actions">
           <button class="btn secondary" onclick="closeAuthModal()">Cancel</button>
-          <button class="btn" onclick="handleEmailSignup()">Create Account</button>
+          <button class="btn" onclick="handleEmailSignup()">Sign Up</button>
         </div>
-        
+
         <button class="link-btn" onclick="switchToLogin()">Already have an account? Sign in</button>
       </div>
     </div>
   </div>
 
-  <main class="container" role="main" aria-labelledby="pageTitle">
-    <div class="brand">
-      <div class="logo" title="InjuryIntel">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="white" opacity="0.08"/><rect x="5.5" y="10.2" width="13" height="3.6" rx="1.8" fill="#fff" opacity="0.9"/></svg>
-      </div>
-      <div class="title">
-        <h1 id="pageTitle">Workout InjuryIntel</h1>
-        <p>AI-powered workout injury analysis with memory-enhanced insights</p>
-      </div>
-
-      <div class="header-controls" role="toolbar" aria-label="Theme and user actions">
-        <button id="themeToggle" class="theme-toggle" aria-pressed="false">
-          <span id="themeIcon">☀️</span> <span id="themeLabel">Light</span>
-        </button>
-        
-        <!-- User Profile or Login Button -->
-        <div id="authSection">
-          <button class="btn" onclick="openAuthModal()">Sign In</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- MAIN CONTENT AREA - Shows locked state or actual content based on auth -->
-    <section class="card input-area" aria-labelledby="describeHeading" id="mainContent">
-      <!-- This will be populated by JavaScript based on auth state -->
-    </section>
-
-    <aside class="panel" aria-labelledby="panelHeading">
-      <!-- Agent Pipeline -->
-      <div class="mini progress-wrap">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div style="font-weight:600;color:var(--text)">Agent Pipeline</div>
-          <div id="progressPercent" style="font-size:13px;color:var(--muted)">0%</div>
-        </div>
-
-        <div class="progress-bar" role="progressbar"><i id="progressFill"></i></div>
-
-        <ul style="list-style:none;margin:10px 0 0 0;padding:0;font-size:13px;color:var(--muted);line-height:1.6">
-          <li>💡 Step 0 — Initiate reasoning loop</li>
-          <li>🧠 Step 1 — Interpret workout description</li>
-          <li>🎯 Step 2 — Identify form deviations</li>
-          <li>🩺 Step 3 — Diagnose likely injury</li>
-          <li>🔍 Step 4 — Cross-check medical research</li>
-          <li>📋 Step 5 — Generate recovery plan</li>
-          <li>🪞 Step 6 — Reflect and refine if confidence is low</li>
-        </ul>
-      </div>
-
-      <!-- History Section -->
-      <div class="mini" id="historyPanel">
-        <strong style="color:var(--text);font-size:15px;">🕐 Recent History</strong>
-        <div id="historyContent" style="margin-top:12px;">
-          <div class="empty-state">Sign in to see your analysis history</div>
-        </div>
-      </div>
-
-      <!-- References Section -->
-      <div class="mini" id="referencesPanel">
-        <strong style="color:var(--text);font-size:15px;">📚 References</strong>
-        <div id="referencesContent" style="margin-top:8px;font-size:13px;color:var(--muted)">
-          Run an analysis to see research sources...
-        </div>
-      </div>
-
-      <!-- Summary Section -->
-      <div class="mini" id="summaryPanel">
-        <strong style="color:var(--text);font-size:15px;">📊 Summary</strong>
-        <div id="summaryContent" style="margin-top:8px;font-size:13px;color:var(--muted)">
-          Run an analysis to see key findings...
-        </div>
-      </div>
-    </aside>
-
-  </main>
-
   <script>
-    // ==================== STATE MANAGEMENT ====================
-    const AppState = {
-      user: null,
-      history: [],
-      isAuthenticated: false
+    const API_BASE = 'https://rebeca-groutiest-incorporeally.ngrok-free.dev';
+
+    let AppState = {
+      isAuthenticated: false,
+      user: null
     };
 
-    // ==================== LOCAL STORAGE HELPERS ====================
+    let conversationId = null;
+    let isProcessing = false;
+    let currentConversation = [];
+
     function saveToLocalStorage(key, value) {
       try {
         localStorage.setItem(key, JSON.stringify(value));
@@ -553,11 +873,12 @@
         return null;
       }
     }
+    
 
-    // ==================== AUTH FUNCTIONS ====================
     function openAuthModal() {
       document.getElementById('authModal').classList.add('show');
     }
+    
 
     function closeAuthModal() {
       document.getElementById('authModal').classList.remove('show');
@@ -569,76 +890,85 @@
     }
 
     function switchToLogin() {
-      document.getElementById('loginForm').style.display = 'block';
       document.getElementById('signupForm').style.display = 'none';
+      document.getElementById('loginForm').style.display = 'block';
     }
 
-    // MOCK GOOGLE SIGN-IN
     function handleGoogleSignIn() {
-      // Simulate Google OAuth with a simple prompt
-      const email = prompt('Enter your Gmail address:');
-      if (!email) return;
+  const email = prompt('Enter your Gmail address:');
+  if (!email) return;
 
-      if (!email.includes('@')) {
-        flashNotice('Please enter a valid email');
-        return;
-      }
+  if (!email.includes('@')) {
+    flashNotice('Please enter a valid email');
+    return;
+  }
 
-      // Extract name from email (simple mock)
-      const name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  const name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
-      // Check if user exists
-      const users = loadFromLocalStorage('users') || {};
-      
-      if (users[email]) {
-        // Existing user - auto login
-        AppState.user = users[email];
-      } else {
-        // New user - auto create account
-        const newUser = {
-          name: name,
-          email: email,
-          provider: 'google',
-          createdAt: new Date().toISOString()
-        };
-        users[email] = newUser;
-        saveToLocalStorage('users', users);
-        AppState.user = newUser;
-      }
+  const users = loadFromLocalStorage('users') || {};
+  
+  if (users[email]) {
+    AppState.user = users[email];
+  } else {
+    const newUser = {
+      name: name,
+      email: email,
+      provider: 'google',
+      createdAt: new Date().toISOString()
+    };
+    users[email] = newUser;
+    saveToLocalStorage('users', users);
+    AppState.user = newUser;
+  }
 
-      AppState.isAuthenticated = true;
-      saveToLocalStorage('currentUser', AppState.user);
-      
-      loadUserHistory();
-      updateUIAfterLogin();
-      closeAuthModal();
-      flashNotice(`Welcome, ${AppState.user.name}! 🎉`);
-    }
+  AppState.isAuthenticated = true;
+  saveToLocalStorage('currentUser', AppState.user);
+  
+  // FORCE CLOSE MODAL - ADD THESE LINES
+  const modal = document.getElementById('authModal');
+  if (modal) {
+    modal.classList.remove('show');
+    modal.style.display = 'none'; // FORCE HIDE
+  }
+  
+  loadUserHistory();
+  updateUIAfterLogin();
+  
+  flashNotice(`Welcome, ${AppState.user.name}! 🎉`);
+}
 
     function handleEmailLogin() {
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
 
-      if (!email || !password) {
-        flashNotice('Please fill in all fields');
-        return;
-      }
+  if (!email || !password) {
+    flashNotice('Please fill in all fields');
+    return;
+  }
 
-      // Check if user exists
-      const users = loadFromLocalStorage('users') || {};
-      if (users[email] && users[email].password === password) {
-        AppState.user = users[email];
-        AppState.isAuthenticated = true;
-        saveToLocalStorage('currentUser', AppState.user);
-        
-        loadUserHistory();
-        updateUIAfterLogin();
-        closeAuthModal();
-        flashNotice(`Welcome back, ${AppState.user.name}!`);
-      } else {
-        flashNotice('Invalid email or password');
-      }
-    }
+  const user = {
+    email: email,
+    name: email.split('@')[0],
+    loginMethod: 'email'
+  };
+
+  AppState.user = user;
+  AppState.isAuthenticated = true;
+  
+  saveToLocalStorage('currentUser', user);
+  
+  // FORCE CLOSE MODAL - ADD THESE LINES
+  const modal = document.getElementById('authModal');
+  if (modal) {
+    modal.classList.remove('show');
+    modal.style.display = 'none'; // FORCE HIDE
+  }
+  
+  loadUserHistory();
+  updateUIAfterLogin();
+  
+  flashNotice('Signed in successfully');
+}
 
     function handleEmailSignup() {
       const name = document.getElementById('signupName').value.trim();
@@ -650,437 +980,260 @@
         return;
       }
 
-      // Check if user already exists
-      const users = loadFromLocalStorage('users') || {};
-      if (users[email]) {
-        flashNotice('Account already exists. Please sign in.');
-        return;
-      }
-
-      // Create new user
-      const newUser = {
-        name: name,
+      const user = {
         email: email,
-        password: password,
-        provider: 'email',
-        createdAt: new Date().toISOString()
+        name: name,
+        loginMethod: 'email'
       };
 
-      users[email] = newUser;
-      saveToLocalStorage('users', users);
-
-      // Auto-login after signup
-      AppState.user = newUser;
+      AppState.user = user;
       AppState.isAuthenticated = true;
-      saveToLocalStorage('currentUser', newUser);
-
+      
+      saveToLocalStorage('currentUser', user);
+      saveToLocalStorage(`history_${email}`, []);
+      loadUserHistory();
       updateUIAfterLogin();
       closeAuthModal();
-      flashNotice(`Account created! Welcome, ${name}!`);
+      
+      flashNotice('Account created successfully');
     }
 
     function handleLogout() {
-      AppState.user = null;
       AppState.isAuthenticated = false;
-      AppState.history = [];
+      AppState.user = null;
+      
       saveToLocalStorage('currentUser', null);
       
-      // CLEAR REFERENCES AND SUMMARY
-      document.getElementById('referencesContent').innerHTML = 
-        'Run an analysis to see research sources...';
+      document.getElementById('userProfile').style.display = 'none';
+      document.getElementById('signInBtn').style.display = 'block';
+      document.getElementById('lockedOverlay').style.display = 'flex';
+      document.getElementById('chatInput').disabled = true;
+      document.getElementById('sendBtn').disabled = true;
       
-      document.getElementById('summaryContent').innerHTML = 
-        'Run an analysis to see key findings...';
+      document.getElementById('historyList').innerHTML = `
+        <div style="color: var(--muted); font-size: 13px; padding: 20px 10px; text-align: center;">
+          Sign in to see your chat history
+        </div>
+      `;
       
-      // CLEAR OUTPUT AREA
-      const outputEl = document.getElementById('output');
-      if (outputEl) outputEl.innerHTML = '';
-
-      updateUIAfterLogout();
+      newConversation();
       flashNotice('Signed out successfully');
     }
 
-    function updateUIAfterLogin() {
-      const authSection = document.getElementById('authSection');
-      const initials = AppState.user.name.split(' ').map(n => n[0]).join('').toUpperCase();
-      
-      authSection.innerHTML = `
-        <div class="user-profile" onclick="toggleUserDropdown()">
-          <div class="user-avatar">${initials}</div>
-          <span style="font-size:14px;color:var(--text)">${AppState.user.name.split(' ')[0]}</span>
-          <div class="user-dropdown" id="userDropdown">
-            <div class="dropdown-item" onclick="viewProfile()">
-              👤 Profile
-            </div>
-            <div class="dropdown-item" onclick="viewAllHistory()">
-              🕐 Full History
-            </div>
-            <div class="dropdown-item" onclick="handleLogout()">
-              🚪 Sign Out
-            </div>
-          </div>
-        </div>
-      `;
-
-      renderMainContent();
-      renderHistory();
-    }
-
-    function updateUIAfterLogout() {
-      const authSection = document.getElementById('authSection');
-      authSection.innerHTML = `<button class="btn" onclick="openAuthModal()">Sign In</button>`;
-      
-      renderMainContent(); // Show locked state
-      
-      const historyContent = document.getElementById('historyContent');
-      historyContent.innerHTML = '<div class="empty-state">Sign in to see your analysis history</div>';
-    }
-
     function toggleUserDropdown() {
-      const dropdown = document.getElementById('userDropdown');
-      dropdown.classList.toggle('show');
+      document.getElementById('userDropdown').classList.toggle('show');
     }
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.user-profile')) {
-        const dropdown = document.getElementById('userDropdown');
-        if (dropdown) dropdown.classList.remove('show');
-      }
-    });
 
     function viewProfile() {
-      flashNotice('Profile page coming soon!');
+      toggleUserDropdown();
+      flashNotice('Profile view coming soon');
     }
 
     function viewAllHistory() {
-      flashNotice('Full history view coming soon!');
+      toggleUserDropdown();
+      flashNotice('Full history view coming soon');
     }
 
-    // ==================== RENDER MAIN CONTENT ====================
-    let currentConversationId = null;
-
-    function renderMainContent() {
-      const mainContent = document.getElementById('mainContent');
-
-      if (!AppState.isAuthenticated) {
-        mainContent.innerHTML = `
-          <div class="locked-overlay">
-            <div class="lock-icon">🔒</div>
-            <h3>Sign In Required</h3>
-            <p>Please sign in to access workout injury chat assistant</p>
-            <button class="btn" onclick="openAuthModal()" style="min-width:200px">Sign In with Google</button>
-          </div>
-        `;
-        return;
-      }
-
-      mainContent.innerHTML = `
-        <div id="chatContainer" class="card" style="display:flex;flex-direction:column;height:70vh;">
-          <div id="chatMessages" style="flex:1;overflow-y:auto;padding:12px;border-radius:8px;background:var(--card-bg);border:1px solid rgba(0,0,0,0.06);margin-bottom:12px;"></div>
-          <div style="display:flex;gap:8px;">
-            <input id="chatInput" type="text" placeholder="Describe your issue..." 
-                  style="flex:1;padding:12px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:var(--card-bg);color:var(--text);font-size:15px;" 
-                  onkeypress="if(event.key==='Enter'){sendChatMessage();}">
-            <button class="btn" onclick="sendChatMessage()">Send</button>
-            <button class="btn secondary" onclick="startNewConversation()">New</button>
-          </div>
-        </div>
-      `;
-
-      // Start new conversation automatically
-      startNewConversation();
-    }
-
-    // ==================== CHAT LOGIC ====================
-    async function startNewConversation() {
-      try {
-        const resp = await fetch('/chat/reset', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ conversation_id: currentConversationId })
-        });
-        const data = await resp.json();
-        currentConversationId = null;
-        document.getElementById('chatMessages').innerHTML = '';
-        appendMessage('system', '🩺 New session started. How can I assist you today?');
-      } catch (e) {
-        appendMessage('system', 'Failed to start a new session.');
-      }
-    }
-
-    async function sendChatMessage() {
-      const inputEl = document.getElementById('chatInput');
-      const text = inputEl.value.trim();
-      if (!text) return;
-      appendMessage('user', text);
-      inputEl.value = '';
-
-      try {
-        const resp = await fetch('/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: text,
-            conversation_id: currentConversationId,
-            userId: AppState.user?.email || null
-          })
-        });
-        const data = await resp.json();
-
-        if (data.ok) {
-          if (!currentConversationId) currentConversationId = data.conversation_id;
-
-          if (data.type === 'question') {
-            appendMessage('assistant', data.question || '(clarification requested)');
-          } else if (data.type === 'complete') {
-            const pretty = JSON.stringify(data.result, null, 2);
-            appendMessage('assistant', `<pre>${escapeHtml(pretty)}</pre>`);
-          } else {
-            appendMessage('assistant', 'Unexpected response type.');
-          }
-        } else {
-          appendMessage('assistant', 'Error: ' + (data.error || 'unknown'));
-        }
-      } catch (err) {
-        appendMessage('assistant', 'Request failed: ' + err.message);
-      }
-    }
-
-    function appendMessage(role, text) {
-      const chat = document.getElementById('chatMessages');
-      if (!chat) return;
-      const msgDiv = document.createElement('div');
-      msgDiv.className = `chat-message ${role}`;
-      msgDiv.innerHTML = escapeHtml(text);
-      chat.appendChild(msgDiv);
-      chat.scrollTop = chat.scrollHeight;
-      sgDiv.style.margin = '8px 0';
-      msgDiv.style.padding = '10px 12px';
-      msgDiv.style.borderRadius = '10px';
-      msgDiv.style.maxWidth = '85%';
-      msgDiv.style.whiteSpace = 'pre-wrap';
-      msgDiv.style.lineHeight = '1.5';
-
-      if (role === 'user') {
-        msgDiv.style.background = 'var(--accent)';
-        msgDiv.style.color = 'white';
-        msgDiv.style.marginLeft = 'auto';
-      } else if (role === 'assistant') {
-        msgDiv.style.background = 'rgba(0,0,0,0.05)';
-        msgDiv.style.color = 'var(--text)';
-      } else {
-        msgDiv.style.fontStyle = 'italic';
-        msgDiv.style.color = 'var(--muted)';
-        msgDiv.style.textAlign = 'center';
-      }
-
-      msgDiv.innerHTML = escapeHtml(text);
-      chat.appendChild(msgDiv);
-      chat.scrollTop = chat.scrollHeight;
-    }
-
-
-    // ==================== MEMORY / HISTORY FUNCTIONS ====================
-    function saveAnalysisToHistory(query, result) {
-      if (!AppState.isAuthenticated) return;
-
-      const historyItem = {
-        id: Date.now(),
-        userId: AppState.user.email,
-        query: query,
-        result: result,
-        timestamp: new Date().toISOString()
-      };
-
-      const allHistory = loadFromLocalStorage('analysisHistory') || [];
-      allHistory.unshift(historyItem);
-
-      const userHistory = allHistory.filter(h => h.userId === AppState.user.email).slice(0, 50);
-      const otherHistory = allHistory.filter(h => h.userId !== AppState.user.email);
+    function updateUIAfterLogin() {
+      document.getElementById('signInBtn').style.display = 'none';
+      document.getElementById('userProfile').style.display = 'flex';
       
-      saveToLocalStorage('analysisHistory', [...userHistory, ...otherHistory]);
+      const userName = AppState.user.name || AppState.user.email.split('@')[0];
+      document.getElementById('userName').textContent = userName;
+      document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
       
-      loadUserHistory();
-      renderHistory();
+      document.getElementById('lockedOverlay').style.display = 'none';
+      document.getElementById('chatInput').disabled = false;
+      document.getElementById('sendBtn').disabled = false;
+      document.getElementById('chatInput').focus();
     }
 
     function loadUserHistory() {
-      if (!AppState.isAuthenticated) {
-        AppState.history = [];
-        return;
-      }
-
-      const allHistory = loadFromLocalStorage('analysisHistory') || [];
-      AppState.history = allHistory
-        .filter(h => h.userId === AppState.user.email)
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-        .slice(0, 10);
-    }
-
-    function renderHistory() {
-      const historyContent = document.getElementById('historyContent');
-
-      if (!AppState.isAuthenticated) {
-        historyContent.innerHTML = '<div class="empty-state">Sign in to see your analysis history</div>';
-        return;
-      }
-
-      if (AppState.history.length === 0) {
-        historyContent.innerHTML = '<div class="empty-state">No analyses yet. Start by describing a workout issue!</div>';
-        return;
-      }
-
-      let historyHTML = '';
-      AppState.history.forEach(item => {
-        const date = new Date(item.timestamp);
-        const timeAgo = getTimeAgo(date);
-        const preview = item.query.substring(0, 60) + (item.query.length > 60 ? '...' : '');
-
-        historyHTML += `
-          <div class="history-item" onclick="loadHistoryItem(${item.id})">
-            <div class="history-item-header">
-              <div class="history-item-title">${escapeHtml(preview)}</div>
-              <div class="history-item-date">${timeAgo}</div>
-            </div>
-            <div class="history-item-preview">
-              ${item.result.parsed_data ? escapeHtml(item.result.parsed_data.exercise || 'Analysis') : 'Analysis'}
-            </div>
+      if (!AppState.isAuthenticated || !AppState.user) return;
+      
+      const history = loadFromLocalStorage(`history_${AppState.user.email}`) || [];
+      
+      const historyList = document.getElementById('historyList');
+      
+      if (history.length === 0) {
+        historyList.innerHTML = `
+          <div style="color: var(--muted); font-size: 13px; padding: 20px 10px; text-align: center;">
+            No chat history yet
           </div>
         `;
+        return;
+      }
+      
+      historyList.innerHTML = '';
+      history.slice(0, 20).forEach((item, index) => {
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        historyItem.onclick = () => loadHistoryItem(index);
+        
+        const title = item.input.substring(0, 40) + (item.input.length > 40 ? '...' : '');
+        const timeAgo = getTimeAgo(item.timestamp);
+        
+        historyItem.innerHTML = `
+          <div class="history-item-title">${escapeHtml(title)}</div>
+          <div class="history-item-time">${timeAgo}</div>
+        `;
+        
+        historyList.appendChild(historyItem);
       });
-
-      historyContent.innerHTML = historyHTML;
     }
 
-    function loadHistoryItem(id) {
-      const item = AppState.history.find(h => h.id === id);
-      if (!item) return;
-
-      document.getElementById('userInput').value = item.query;
+    function saveAnalysisToHistory(input, result) {
+      if (!AppState.isAuthenticated || !AppState.user) return;
       
-      const outEl = document.getElementById('output');
-      const pretty = JSON.stringify(item.result, null, 2);
-      outEl.innerHTML = `
-        <div class="result-card">
-          <div style="font-weight:700;font-size:15px;color:var(--text)">Previous Analysis</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:4px">From ${new Date(item.timestamp).toLocaleString()}</div>
-          <pre style="margin-top:10px;white-space:pre-wrap;color:var(--muted)">${escapeHtml(pretty)}</pre>
-        </div>
-      `;
+      const history = loadFromLocalStorage(`history_${AppState.user.email}`) || [];
+      
+      const newEntry = {
+        input: input,
+        result: result,
+        conversation: currentConversation,
+        timestamp: new Date().toISOString()
+      };
+      
+      history.unshift(newEntry);
+      
+      if (history.length > 50) {
+        history.pop();
+      }
+      
+      saveToLocalStorage(`history_${AppState.user.email}`, history);
+      loadUserHistory();
+    }
 
+    function loadHistoryItem(index) {
+      const history = loadFromLocalStorage(`history_${AppState.user.email}`) || [];
+      const item = history[index];
+      
+      if (!item) return;
+      
+      newConversation();
+      
+      if (item.conversation && item.conversation.length > 0) {
+        item.conversation.forEach(msg => {
+          addMessage(msg.role, msg.content);
+        });
+      }
+      
       if (item.result) {
         updateSidebar(item.result);
       }
-
-      flashNotice('Loaded from history');
     }
 
-    function getTimeAgo(date) {
-      const seconds = Math.floor((new Date() - date) / 1000);
+    function getTimeAgo(timestamp) {
+      const now = new Date();
+      const past = new Date(timestamp);
+      const diffMs = now - past;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
       
-      if (seconds < 60) return 'just now';
-      if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
-      if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
-      if (seconds < 604800) return Math.floor(seconds / 86400) + 'd ago';
-      return date.toLocaleDateString();
+      if (diffMins < 1) return 'Just now';
+      if (diffMins < 60) return `${diffMins}m ago`;
+      if (diffHours < 24) return `${diffHours}h ago`;
+      if (diffDays < 7) return `${diffDays}d ago`;
+      return past.toLocaleDateString();
     }
 
-    // ==================== THEME MANAGEMENT ====================
-    const themeToggleBtn = document.getElementById('themeToggle');
-    const themeLabel = document.getElementById('themeLabel');
-    const themeIcon = document.getElementById('themeIcon');
-    
-    (function initTheme(){
-      const stored = loadFromLocalStorage('preferredTheme');
-      const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const initial = stored || (systemPrefersDark ? 'dark' : 'light');
-      applyTheme(initial, false);
-      
-      themeToggleBtn && themeToggleBtn.addEventListener('click', () => {
-        const current = document.documentElement.getAttribute('data-theme') || 'light';
-        const next = current === 'dark' ? 'light' : 'dark';
-        applyTheme(next, true);
-      });
-    })();
-
-    function applyTheme(t, save){
-      document.documentElement.setAttribute('data-theme', t);
-      if(themeIcon) themeIcon.textContent = t === 'dark' ? '🌙' : '☀️';
-      if(themeLabel) themeLabel.textContent = t === 'dark' ? 'Dark' : 'Light';
-      if(save) saveToLocalStorage('preferredTheme', t);
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
     }
 
-    // ==================== MAIN ANALYSIS FUNCTION ====================
-    const output = document.getElementById('output');
-
-    function clearInput(){
-      const userInput = document.getElementById('userInput');
-      if (userInput) userInput.value = '';
+    function addMessage(role, content) {
+      const messagesContainer = document.getElementById('chatMessages');
       
-      const output = document.getElementById('output');
-      if (output) output.innerHTML = '';
-      
-      updateProgress(0);
-    }
-
-    function setBtnState(isBusy){
-      const runMasterBtn = document.getElementById('runMasterBtn');
-      const clearBtn = document.getElementById('clearBtn');
-      
-      if (runMasterBtn) runMasterBtn.disabled = isBusy;
-      if (clearBtn) clearBtn.disabled = isBusy;
-    }
-
-    function updateProgress(p){
-      const f = document.getElementById('progressFill');
-      if(f) f.style.width = p + '%';
-      const pp = document.getElementById('progressPercent');
-      if(pp) pp.textContent = p + '%';
-    }
-
-    function animateProgress(duration = 4000) {
-      const bar = document.getElementById("progressFill");
-      const percentText = document.getElementById("progressPercent");
-      if (!bar || !percentText) return;
-      
-      let startTime = null;
-
-      function step(timestamp) {
-        if (!startTime) startTime = timestamp;
-        const progress = Math.min((timestamp - startTime) / duration, 1);
-        const percent = Math.floor(progress * 100);
-        bar.style.width = percent + "%";
-        percentText.textContent = percent + "%";
-
-        if (progress < 1) {
-          requestAnimationFrame(step);
-        }
+      const emptyState = messagesContainer.querySelector('.empty-state');
+      if (emptyState) {
+        emptyState.remove();
       }
-      requestAnimationFrame(step);
+
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${role}`;
+      messageDiv.textContent = content;
+
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+      currentConversation.push({ role, content });
+    }
+
+    function addTypingIndicator() {
+      const messagesContainer = document.getElementById('chatMessages');
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'message agent';
+      typingDiv.id = 'typingIndicator';
+      typingDiv.innerHTML = `
+        <div class="typing-indicator">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      `;
+      messagesContainer.appendChild(typingDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+      const typingIndicator = document.getElementById('typingIndicator');
+      if (typingIndicator) {
+        typingIndicator.remove();
+      }
+    }
+
+    function updateAgentSteps(agentsExecuted) {
+      const stepMapping = {
+        'ParsingAgent': 1,
+        'FormAnalysisAgent': 2,
+        'InjuryDiagnosisAgent': 3,
+        'ResearchAgent': 4,
+        'PrescriptionAgent': 5
+      };
+
+      if (!agentsExecuted || agentsExecuted.length === 0) return;
+
+      const steps = document.querySelectorAll('.agent-step');
+      
+      agentsExecuted.forEach(agentName => {
+        const stepIndex = stepMapping[agentName];
+        if (stepIndex !== undefined && steps[stepIndex]) {
+          steps[stepIndex].classList.add('completed');
+        }
+      });
     }
 
     function updateSidebar(result) {
       const referencesContent = document.getElementById('referencesContent');
       const webResults = result.web_results || [];
       const sources = result.web_sources || [];
-      
+      const researchFindings = result.research_findings || '';
+
+      // Check if sources are from KB or Web
+      const isKnowledgeBase = researchFindings && researchFindings.includes('knowledge base');
+
       if (webResults.length > 0) {
-        let refsHTML = '';
+        let refsHTML = '<div style="margin-bottom: 8px; font-weight: 600; font-size: 12px; color: var(--accent);">🌐 Web Sources</div>';
         webResults.forEach((item, idx) => {
           const title = item.title || `Source ${idx + 1}`;
           const url = item.url || '#';
-          refsHTML += `<a href="${escapeHtml(url)}" target="_blank" class="reference-link">${escapeHtml(title)}</a>`;
+          refsHTML += `<a href="${escapeHtml(url)}" target="_blank" rel="noopener" class="reference-link">${escapeHtml(title)}</a>`;
         });
         referencesContent.innerHTML = refsHTML;
       } else if (sources.length > 0) {
-        let refsHTML = '';
+        let refsHTML = '<div style="margin-bottom: 8px; font-weight: 600; font-size: 12px; color: var(--accent);">🌐 Web Sources</div>';
         sources.forEach((url, idx) => {
-          refsHTML += `<a href="${escapeHtml(url)}" target="_blank" class="reference-link">Source ${idx + 1}</a>`;
+          const domain = new URL(url).hostname;
+          refsHTML += `<a href="${escapeHtml(url)}" target="_blank" rel="noopener" class="reference-link">${escapeHtml(domain)} - Source ${idx + 1}</a>`;
         });
         referencesContent.innerHTML = refsHTML;
+      } else if (isKnowledgeBase) {
+        referencesContent.innerHTML = '<div style="margin-bottom: 8px; font-weight: 600; font-size: 12px; color: var(--accent);">📚 Knowledge Base</div><div style="padding: 10px; background: var(--card-bg); border-radius: 8px; font-size: 13px; color: var(--muted);">Information retrieved from internal medical knowledge base</div>';
       } else {
-        referencesContent.innerHTML = 'No external sources found in this analysis.';
+        referencesContent.innerHTML = '<div style="color: var(--muted); font-size: 13px;">No external sources referenced.</div>';
       }
 
       const summaryContent = document.getElementById('summaryContent');
@@ -1088,9 +1241,7 @@
       const parsedData = result.parsed_data || {};
       const exercise = parsedData.exercise || 'Unknown';
       const painLocation = parsedData.pain_location || 'Unknown';
-      
-      const diagnosisShort = diagnosis.split('\n')[0].substring(0, 120) + '...';
-      
+
       const summaryHTML = `
         <div class="summary-item">
           <span class="summary-label">Exercise:</span> ${escapeHtml(exercise)}
@@ -1099,133 +1250,178 @@
           <span class="summary-label">Pain Area:</span> ${escapeHtml(painLocation)}
         </div>
         <div class="summary-item">
-          <span class="summary-label">Diagnosis:</span> ${escapeHtml(diagnosisShort)}
-        </div>
-        <div class="summary-item">
-          <span class="summary-label">Medical Attention:</span> ${result.requires_medical_attention ? '⚠️ Recommended' : '✓ Not urgent'}
+          <span class="summary-label">Status:</span> Analysis complete
         </div>
       `;
       summaryContent.innerHTML = summaryHTML;
     }
 
-    async function runMasterAndShow(){
+    function formatActionPlan(actionPlan) {
+      if (!actionPlan) return 'No action plan generated.';
+      
+      let formatted = actionPlan.replace(/\*\*/g, '');
+      return formatted;
+    }
+
+    async function sendMessage() {
       if (!AppState.isAuthenticated) {
         flashNotice('Please sign in first');
         openAuthModal();
         return;
       }
 
-      setBtnState(true);
-      const outEl = document.getElementById('output');
-      if (!outEl) return;
-      
-      outEl.innerHTML = `<div class="result-card">Running analysis… <span style="opacity:.7">Processing your workout injury report with AI agents.</span></div>`;
-      const progressPromise = animateProgress(17500);
-      
-      try {
-        const userInput = document.getElementById("userInput");
-        if (!userInput) return;
-        
-        const userInputText = userInput.value.trim();
-        
-        if (!userInputText) {
-          flashNotice('Please describe your workout issue first');
-          setBtnState(false);
-          return;
-        }
+      const input = document.getElementById('chatInput');
+      const sendBtn = document.getElementById('sendBtn');
+      const message = input.value.trim();
 
-        const resp = await fetch('https://rebeca-groutiest-incorporeally.ngrok-free.dev/run', {
+      if (!message || isProcessing) return;
+
+      addMessage('user', message);
+      input.value = '';
+      
+      isProcessing = true;
+      sendBtn.disabled = true;
+      input.disabled = true;
+
+      addTypingIndicator();
+
+      try {
+        const response = await fetch(`${API_BASE}/chat`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            input: userInputText,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: message,
+            conversation_id: conversationId,
             userId: AppState.user ? AppState.user.email : null
           })
         });
 
-        const data = await resp.json();
-        updateProgress(100);
-        
-        if (data.ok) {
-          const pretty = data.printed || JSON.stringify(data.result, null, 2);
-          outEl.innerHTML = `
-            <div class="result-card">
-              <div style="font-weight:700;font-size:15px;color:var(--text)">Analysis Complete</div>
-              <pre style="margin-top:10px;white-space:pre-wrap;color:var(--muted)">${escapeHtml(pretty)}</pre>
-            </div>
-          `;
+        const data = await response.json();
+
+        removeTypingIndicator();
+
+        if (!data.ok) {
+          addMessage('system', `Error: ${data.error || 'Unknown error'}`);
+          return;
+        }
+
+        if (data.conversation_id) {
+          conversationId = data.conversation_id;
+        }
+
+        if (data.type === 'question') {
+          addMessage('agent', data.question);
+        } else if (data.type === 'complete') {
+          const result = data.result;
           
-          if (data.result) {
-            updateSidebar(data.result);
-            
-            if (AppState.isAuthenticated) {
-              saveAnalysisToHistory(userInputText, data.result);
+          const actionPlan = formatActionPlan(result.action_plan);
+          addMessage('agent', actionPlan);
+
+          if (result) {
+            updateSidebar(result);
+          }
+          // Get agents that ACTUALLY ran (not all 5)
+          const agentsRan = data.agents_executed || (data.result && data.result.agents_executed) || 
+                            (data.execution_summary && data.execution_summary.agents_executed) || [];
+          
+          console.log('DEBUG - Agents that actually ran:', agentsRan);
+          
+          if (agentsRan.length > 0) {
+            updateAgentSteps(agentsRan);
+          }
+
+          
+          if (AppState.isAuthenticated) {
+            const firstUserMessage = currentConversation.find(m => m.role === 'user');
+            if (firstUserMessage) {
+              saveAnalysisToHistory(firstUserMessage.content, result);
             }
           }
-        } else {
-          const body = data.output && data.output.length ? data.output : '(no output)';
-          outEl.innerHTML = `
-            <div class="result-card">
-              <div style="font-weight:700;font-size:15px;color:var(--text)">Analysis Output</div>
-              <pre style="margin-top:10px;color:var(--muted);white-space:pre-wrap">${escapeHtml(body)}</pre>
-            </div>
-          `;
         }
-      } catch (err) {
-        outEl.innerHTML = `<div class="result-card">Request failed: ${escapeHtml(err.message || String(err))}</div>`;
+
+      } catch (error) {
+        removeTypingIndicator();
+        addMessage('system', `Connection error: ${error.message}`);
       } finally {
-        updateProgress(100);
-        setBtnState(false);
+        isProcessing = false;
+        sendBtn.disabled = false;
+        input.disabled = false;
+        input.focus();
       }
     }
 
-    function escapeHtml(s){ 
-      return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); 
-    }
-    
-    function flashNotice(msg){
-      const t = document.createElement('div'); 
-      t.className='toast'; 
-      t.textContent = msg; 
-      document.body.appendChild(t);
-      setTimeout(()=>{ 
-        t.style.opacity='0'; 
-        t.style.transform='translateY(6px)'; 
-      }, 1400);
-      setTimeout(()=> t.remove(), 2200);
-    }
+    function newConversation() {
+      if (!AppState.isAuthenticated) {
+        flashNotice('Please sign in to start a conversation');
+        openAuthModal();
+        return;
+      }
 
-    // ==================== INITIALIZATION ====================
-    (function init(){ 
-      updateProgress(0);
+      conversationId = null;
+      isProcessing = false;
+      currentConversation = [];
       
-      // Check if user is already logged in
-      const currentUser = loadFromLocalStorage('currentUser');
-      if (currentUser && currentUser.email) {
-        AppState.user = currentUser;
-        AppState.isAuthenticated = true;
-        loadUserHistory();
-        updateUIAfterLogin();
-      } else {
-        renderMainContent(); // Show locked state
-      }
-    })();
+      const messagesContainer = document.getElementById('chatMessages');
+      messagesContainer.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">💬</div>
+          <h2>Start a Conversation</h2>
+          <p>Describe your workout injury or pain, and I'll help analyze it.</p>
+        </div>
+      `;
 
-    // Expose functions
-    window.clearInput = clearInput;
-    window.runMasterAndShow = runMasterAndShow;
-    window.openAuthModal = openAuthModal;
-    window.closeAuthModal = closeAuthModal;
-    window.switchToSignup = switchToSignup;
-    window.switchToLogin = switchToLogin;
-    window.handleGoogleSignIn = handleGoogleSignIn;
-    window.handleEmailLogin = handleEmailLogin;
-    window.handleEmailSignup = handleEmailSignup;
-    window.handleLogout = handleLogout;
-    window.toggleUserDropdown = toggleUserDropdown;
-    window.viewProfile = viewProfile;
-    window.viewAllHistory = viewAllHistory;
-    window.loadHistoryItem = loadHistoryItem;
+      document.getElementById('referencesContent').innerHTML = 'Run an analysis to see research sources...';
+      document.getElementById('summaryContent').innerHTML = 'Run an analysis to see key findings...';
+
+      const steps = document.querySelectorAll('.agent-step');
+      steps.forEach(step => {
+        step.classList.remove('active', 'completed');
+      });
+
+      document.getElementById('chatInput').value = '';
+      document.getElementById('chatInput').focus();
+    }
+
+    function flashNotice(msg) {
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => {
+        t.style.opacity = '0';
+        t.style.transform = 'translateY(6px)';
+      }, 2000);
+      setTimeout(() => t.remove(), 2500);
+    }
+
+    document.getElementById('chatInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    document.getElementById('chatInput').addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    document.addEventListener('click', function(e) {
+      const dropdown = document.getElementById('userDropdown');
+      const profile = document.getElementById('userProfile');
+      
+      if (dropdown && profile && !profile.contains(e.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+
+    window.addEventListener('load', () => {
+      // DO NOT auto-login - user must sign in explicitly
+      // This ensures users start logged out by default
+      document.getElementById('chatInput').focus();
+    });
   </script>
 </body>
 </html>
