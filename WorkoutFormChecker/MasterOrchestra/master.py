@@ -6,7 +6,6 @@ import time
 from io import StringIO
 from contextlib import redirect_stdout
 
-# Ensure imports work
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, current_dir)
 
@@ -17,92 +16,37 @@ from form_analysis_agent import FormAnalysisAgent
 from injury_diagnosis_agent import InjuryDiagnosisAgent
 from research_agent import ResearchAgent
 from prescription_agent import PrescriptionAgent
+from simple_extractor import SimpleExtractor
 
 
-# =====================================================
-# 🪞 Reflection Controller (Quality Checks)
-# =====================================================
 class ReflectionController:
-    """
-    Evaluates agent output quality and confidence
-    Decides if we need to retry, gather more info, or proceed
-    """
-    
     def __init__(self):
         self.reflections = []
         self.confidence_map = {"low": 1, "medium": 2, "high": 3}
     
     def evaluate_confidence(self, level):
-        """Convert confidence string to numeric score"""
         return self.confidence_map.get(str(level).lower(), 1)
     
     def reflect_on_result(self, agent_name, result, state):
-        """
-        Evaluate agent result quality
-        
-        Returns:
-            dict with:
-                - should_continue: bool
-                - needs_more_info: bool  
-                - feedback: str
-        """
         confidence = result.get("confidence", "unknown")
+        print(f"\n🪞 Reflection on {agent_name}: Confidence: {confidence}")
         
-        print(f"\n🪞 Reflection on {agent_name}:")
-        print(f"   Confidence: {confidence}")
-        
-        # Check confidence level
         if confidence == "high":
-            print(f"   ✅ High confidence - proceeding")
-            return {
-                "should_continue": True,
-                "needs_more_info": False,
-                "feedback": "High quality result"
-            }
-        
+            return {"should_continue": True, "needs_more_info": False, "feedback": "High quality result"}
         elif confidence == "medium":
-            print(f"   🤔 Medium confidence - acceptable, continuing")
-            return {
-                "should_continue": True,
-                "needs_more_info": False,
-                "feedback": "Acceptable confidence level"
-            }
-        
-        else:  # low or unknown
-            print(f"   ⚠️ Low confidence - may need more evidence")
+            return {"should_continue": True, "needs_more_info": False, "feedback": "Acceptable confidence level"}
+        else:
             self.reflections.append(f"{agent_name}: Low confidence detected")
-            
-            return {
-                "should_continue": True,  # Let planner decide what to do
-                "needs_more_info": True,
-                "feedback": "Low confidence - consider gathering more evidence"
-            }
+            return {"should_continue": True, "needs_more_info": True, "feedback": "Low confidence"}
     
     def get_reflection_summary(self):
-        """Get summary of all reflections"""
-        return {
-            "total_reflections": len(self.reflections),
-            "issues": self.reflections
-        }
+        return {"total_reflections": len(self.reflections), "issues": self.reflections}
 
 
-# =====================================================
-# 🎼 Dynamic Master Orchestrator
-# =====================================================
 class DynamicMasterOrchestrator:
-    """
-    Dynamic multi-agent orchestration with conversational flow
-    
-    - Uses PlannerAgent to decide which agent runs next
-    - Supports multi-turn conversation
-    - Can pause and ask user for clarification
-    - Dynamically adapts workflow based on case complexity
-    """
-    
     def __init__(self):
         print("🎼 Initializing Dynamic Master Orchestrator...")
         
-        # Initialize all agents (pool, not pipeline!)
         self.agents = {
             "ParsingAgent": ParsingAgent(),
             "FormAnalysisAgent": FormAnalysisAgent(),
@@ -111,12 +55,11 @@ class DynamicMasterOrchestrator:
             "PrescriptionAgent": PrescriptionAgent()
         }
         
-        # Initialize orchestration components
         self.planner = PlannerAgent()
         self.conversation_manager = ConversationManager()
         self.reflection = ReflectionController()
+        self.simple_extractor = SimpleExtractor()
         
-        # State tracking
         self.state = {
             "collected_data": {},
             "agent_results": {},
@@ -125,54 +68,88 @@ class DynamicMasterOrchestrator:
             "workflow_complete": False
         }
         
-        print("✅ All agents and orchestration components initialized!")
+        print("✅ All agents initialized!")
     
     def process_user_message(self, user_message):
-        """
-        Process ONE user message in the dynamic workflow
-        
-        This is called each time user sends a message
-        Can return:
-        - "question" type: Need more info from user
-        - "processing" type: Analysis in progress  
-        - "complete" type: Final result ready
-        
-        Args:
-            user_message: str - User's message
-            
-        Returns:
-            dict with type, content, and state
-        """
-        
         print("\n" + "="*70)
-        print(f"📨 Processing user message: {user_message[:80]}...")
+        print(f"📨 Processing: {user_message[:80]}...")
         print("="*70)
         
-        # Add user message to conversation
         self.conversation_manager.add_message("user", user_message)
         
-        # Dynamic execution loop
-        max_iterations = 15  # Safety limit
+        # FIRST: Try simple extraction on first message
+        if len(self.conversation_manager.conversation_history) == 1:
+            print("\n🔍 Running simple extraction on initial message...")
+            simple_data = self.simple_extractor.extract(user_message)
+            
+            # Only use extracted data if it's not "unknown"
+            for key, value in simple_data.items():
+                if value != "unknown":
+                    self.conversation_manager.update_collected_data({key: value})
+                    self.state["collected_data"] = self.conversation_manager.collected_data
+            
+            print(f"   Simple extraction found: {list(simple_data.keys())}")
+            print(f"   Collected data now: {self.state['collected_data']}")
+        
+        # Check if follow-up answer
+        if self._is_follow_up_answer():
+            self._handle_follow_up_answer(user_message)
+        
+        max_iterations = 100  # Increased to handle extensive Q&A
         iteration = 0
+        last_progress_check = 0
+        last_agent_count = 0
         
         while iteration < max_iterations:
             iteration += 1
             print(f"\n🔄 Iteration {iteration}")
             
-            # STEP 1: Ask Planner what to do next
-            decision = self.planner.decide_next_action(self.state)
+            # Every 5 iterations, check if we're making progress
+            if iteration % 5 == 0:
+                current_agent_count = len(self.planner.execution_history)
+                print(f"\n🔍 Progress check at iteration {iteration}:")
+                print(f"   Agents run: {current_agent_count} (last check: {last_agent_count})")
+                
+                if current_agent_count == last_agent_count:
+                    print(f"   ⚠️ STUCK! No agent progress in last 5 iterations")
+                    print(f"   → Forcing conversation to complete and proceed to diagnosis")
+                    
+                    # Force conversation manager to stop asking questions
+                    self.conversation_manager.force_proceed()
+                    
+                    # If we're still before diagnosis, force it to run
+                    if "InjuryDiagnosisAgent" not in self.planner.execution_history:
+                        print(f"   → Forcing InjuryDiagnosisAgent to run")
+                        result = self._execute_agent("InjuryDiagnosisAgent", "")
+                        self.state["agent_results"]["InjuryDiagnosisAgent"] = result
+                        self.planner.record_agent_execution("InjuryDiagnosisAgent")
+                else:
+                    print(f"   ✓ Making progress! {current_agent_count - last_agent_count} agents ran")
+                
+                last_agent_count = current_agent_count
+            
+            decision = self.planner.decide_next_action({
+                **self.state,
+                "conversation_turns": len(self.conversation_manager.conversation_history)
+            })
             
             action = decision["action"]
             reason = decision["reason"]
             
-            print(f"   🧠 Planner Decision: {action}")
+            print(f"   🧠 Planner: {action}")
             print(f"   📝 Reason: {reason}")
             
-            # STEP 2: Execute decision
-            
-            # CASE A: Need to ask user a question
             if action == "ask_user":
                 question = decision["question"]
+                
+                # If planner didn't provide a question, get one from conversation_manager
+                if question is None:
+                    question = self.conversation_manager.generate_clarifying_question()
+                
+                if not question:
+                    # No more questions to ask, proceed
+                    print("   No more questions - proceeding to diagnosis")
+                    continue
                 
                 self.conversation_manager.add_message("agent", question, "PlannerAgent")
                 
@@ -184,45 +161,28 @@ class DynamicMasterOrchestrator:
                     "state": self._get_state_snapshot()
                 }
             
-            # CASE B: Run an agent
             elif action == "run_agent":
                 agent_name = decision["agent"]
-                
-                # Execute the agent
                 result = self._execute_agent(agent_name, user_message)
                 
-                # Store result
                 self.state["agent_results"][agent_name] = result
                 self.state["last_agent"] = agent_name
                 
-                # Update collected data if parsing result
                 if "parsed_data" in result:
                     self.conversation_manager.update_collected_data(result["parsed_data"])
                     self.state["collected_data"] = self.conversation_manager.collected_data
                 
-                # Update confidence
                 if "confidence" in result:
                     self.state["confidence"] = result["confidence"]
                 
-                # Record agent execution
                 self.planner.record_agent_execution(agent_name)
+                self.reflection.reflect_on_result(agent_name, result, self.state)
                 
-                # Reflection: Check result quality
-                reflection_result = self.reflection.reflect_on_result(
-                    agent_name, 
-                    result, 
-                    self.state
-                )
-                
-                # Continue loop (planner will decide next action)
                 continue
             
-            # CASE C: Workflow complete
             elif action == "complete":
-                print("\n✅ Workflow complete - compiling final result")
-                
+                print("\n✅ Workflow complete")
                 self.state["workflow_complete"] = True
-                
                 final_result = self._compile_final_result()
                 
                 return {
@@ -234,79 +194,60 @@ class DynamicMasterOrchestrator:
                     "state": self._get_state_snapshot()
                 }
             
-            # CASE D: Unknown action (shouldn't happen)
             else:
                 print(f"⚠️ Unknown action: {action}")
                 break
         
-        # Safety: Max iterations reached
-        print(f"⚠️ Max iterations ({max_iterations}) reached")
+        print(f"⚠️ Max iterations reached ({max_iterations}) - forcing completion")
+        
+        # Force complete with whatever we have
+        self.state["workflow_complete"] = True
+        final_result = self._compile_final_result()
         
         return {
-            "type": "error",
-            "error": "Max iterations reached - workflow did not complete",
-            "state": self._get_state_snapshot()
+            "type": "complete",
+            "result": final_result,
+            "conversation": self.conversation_manager.conversation_history,
+            "execution_summary": self.planner.get_execution_summary(),
+            "reflection_summary": self.reflection.get_reflection_summary(),
+            "state": self._get_state_snapshot(),
+            "warning": f"Reached max iterations ({max_iterations}), completing with available data"
         }
     
     def _execute_agent(self, agent_name, context):
-        """
-        Execute a specific agent with appropriate inputs
-        
-        Args:
-            agent_name: Name of agent to execute
-            context: User's original message (for parsing)
-        
-        Returns:
-            Agent result dict
-        """
-        
         print(f"\n⚡ Executing: {agent_name}")
-        
         agent = self.agents[agent_name]
         
-        # Route to correct agent with correct inputs
-        
         if agent_name == "ParsingAgent":
-            # Parsing needs the raw user message
-            return agent.execute(context)
+            user_messages = [msg["content"] for msg in self.conversation_manager.conversation_history if msg.get("role") == "user"]
+            full_context = " | ".join(user_messages)
+            return agent.execute(full_context)
         
         elif agent_name == "FormAnalysisAgent":
-            # Form analysis needs parsed data
             return agent.execute(self.state["collected_data"])
         
         elif agent_name == "InjuryDiagnosisAgent":
-            # Diagnosis needs parsed data + form analysis
             form_result = self.state["agent_results"].get("FormAnalysisAgent", {})
             return agent.execute(self.state["collected_data"], form_result)
         
         elif agent_name == "ResearchAgent":
-            # Research needs diagnosis + parsed data
             diagnosis = self.state["agent_results"].get("InjuryDiagnosisAgent", {})
             return agent.execute(diagnosis, self.state["collected_data"])
         
         elif agent_name == "PrescriptionAgent":
-            # Prescription needs everything
             diagnosis = self.state["agent_results"].get("InjuryDiagnosisAgent", {})
             research = self.state["agent_results"].get("ResearchAgent", {})
             form = self.state["agent_results"].get("FormAnalysisAgent", {})
             return agent.execute(diagnosis, research, form, self.state["collected_data"])
         
         else:
-            print(f"❌ Unknown agent: {agent_name}")
             return {"error": f"Unknown agent: {agent_name}"}
     
     def _compile_final_result(self):
-        """
-        Compile all agent results into final output
-        """
-        
         agent_results = self.state["agent_results"]
-        
-        # Extract key information
         parsed_data = self.state.get("collected_data", {})
         
         form_analysis = agent_results.get("FormAnalysisAgent", {}).get("form_analysis", "N/A")
-        
         diagnosis = agent_results.get("InjuryDiagnosisAgent", {}).get("diagnosis", "N/A")
         
         research = agent_results.get("ResearchAgent", {})
@@ -314,8 +255,9 @@ class DynamicMasterOrchestrator:
         web_sources = research.get("sources", [])
         web_results = research.get("web_results", [])
         
-        action_plan = agent_results.get("PrescriptionAgent", {}).get("action_plan", "N/A")
+        print(f"DEBUG _compile_final_result - web_results: {len(web_results)}, web_sources: {len(web_sources)}")
         
+        action_plan = agent_results.get("PrescriptionAgent", {}).get("action_plan", "N/A")
         requires_medical = agent_results.get("InjuryDiagnosisAgent", {}).get("requires_medical_attention", False)
         
         return {
@@ -334,7 +276,6 @@ class DynamicMasterOrchestrator:
         }
     
     def _get_state_snapshot(self):
-        """Get current state for debugging/API response"""
         return {
             "collected_data": self.state["collected_data"],
             "confidence": self.state["confidence"],
@@ -342,91 +283,89 @@ class DynamicMasterOrchestrator:
             "agents_executed": self.planner.execution_history,
             "conversation_turns": len(self.conversation_manager.conversation_history)
         }
-
-
-# =====================================================
-# 🚀 Entry Points
-# =====================================================
-
-def run_conversation(user_message):
-    """
-    Entry point for conversational flow
-    Processes ONE message at a time
     
-    Args:
-        user_message: User's message
+    def _is_follow_up_answer(self):
+        history = self.conversation_manager.conversation_history
+        if len(history) < 2:
+            return False
+        last_msg = history[-2]
+        return last_msg.get("role") == "agent" and "?" in last_msg.get("content", "")
+    
+    def _handle_follow_up_answer(self, answer):
+        history = self.conversation_manager.conversation_history
+        if len(history) < 2:
+            return
         
-    Returns:
-        Response dict with type and content
-    """
-    
-    # Create or load orchestrator
-    # In real implementation, this would be session-based
-    orchestrator = DynamicMasterOrchestrator()
-    
-    # Process message
-    result = orchestrator.process_user_message(user_message)
-    
-    return result
-
-
-def run_single_shot(user_input):
-    """
-    Entry point for single-shot analysis (backward compatibility)
-    Processes entire flow in one go
-    
-    Args:
-        user_input: Complete user description
+        last_agent_msg = history[-2].get("content", "").lower()
+        answer_lower = answer.lower().strip()
         
-    Returns:
-        Final result dict
-    """
-    
-    buf = StringIO()
-    orchestrator = DynamicMasterOrchestrator()
-    
-    with redirect_stdout(buf):
-        # Keep processing until complete
-        result = orchestrator.process_user_message(user_input)
+        print(f"\n📝 Capturing follow-up answer:")
+        print(f"   Question was: {last_agent_msg[:60]}...")
+        print(f"   Answer: {answer_lower}")
         
-        # If it asks questions, auto-skip them for single-shot mode
-        while result["type"] == "question":
-            # Force proceed without additional info
-            orchestrator.conversation_manager.force_proceed()
-            result = orchestrator.process_user_message("Continue with what you have")
-        
-        if result["type"] == "complete":
-            final = result["result"]
-            
-            print("\n" + "="*70)
-            print("📊 FINAL RESULTS")
-            print("="*70)
-            print("\n🎯 ACTION PLAN:")
-            print(final["action_plan"])
-    
-    printed_output = buf.getvalue()
-    
-    return {
-        "result": result.get("result", result),
-        "printed": printed_output
-    }
-
-
-def main():
-    """
-    Main entry point for testing
-    """
-    print("🧪 Testing Dynamic Master Orchestrator...\n")
-    
-    # Test input
-    test_input = "Sharp right knee pain during squat ascent"
-    
-    result = run_single_shot(test_input)
-    
-    print(result["printed"])
-    
-    return result
-
-
-if __name__ == "__main__":
-    main()
+        if "exercise" in last_agent_msg or "what exercise" in last_agent_msg or "doing when" in last_agent_msg:
+            self.conversation_manager.update_collected_data({"exercise": answer_lower})
+            self.state["collected_data"] = self.conversation_manager.collected_data
+            print(f"   ✓ Captured: exercise = {answer_lower}")
+        elif ("where" in last_agent_msg and "pain" in last_agent_msg) or "pain location" in last_agent_msg:
+            self.conversation_manager.update_collected_data({"pain_location": answer_lower})
+            self.state["collected_data"] = self.conversation_manager.collected_data
+            print(f"   ✓ Captured: pain_location = {answer_lower}")
+        elif ("when" in last_agent_msg and "pain" in last_agent_msg) or "pain occur" in last_agent_msg:
+            self.conversation_manager.update_collected_data({"pain_timing": answer_lower})
+            self.state["collected_data"] = self.conversation_manager.collected_data
+            print(f"   ✓ Captured: pain_timing = {answer_lower}")
+        elif "which side" in last_agent_msg or ("left" in last_agent_msg and "right" in last_agent_msg):
+            self.conversation_manager.update_collected_data({"pain_side": answer_lower})
+            self.state["collected_data"] = self.conversation_manager.collected_data
+            print(f"   ✓ Captured: pain_side = {answer_lower}")
+        elif "how intense" in last_agent_msg or "intensity" in last_agent_msg:
+            self.conversation_manager.update_collected_data({"pain_intensity": answer_lower})
+            self.state["collected_data"] = self.conversation_manager.collected_data
+            print(f"   ✓ Captured: pain_intensity = {answer_lower}")
+        elif "what type" in last_agent_msg or "describe the pain" in last_agent_msg:
+            self.conversation_manager.update_collected_data({"pain_type": answer_lower})
+            self.state["collected_data"] = self.conversation_manager.collected_data
+            print(f"   ✓ Captured: pain_type = {answer_lower}")
+        elif "movement phase" in last_agent_msg or "point in the movement" in last_agent_msg:
+            self.conversation_manager.update_collected_data({"movement_phase": answer_lower})
+            self.state["collected_data"] = self.conversation_manager.collected_data
+            print(f"   ✓ Captured: movement_phase = {answer_lower}")
+        elif "how long ago" in last_agent_msg or "when did" in last_agent_msg or "duration" in last_agent_msg:
+            self.conversation_manager.update_collected_data({"duration_since_onset": answer_lower})
+            self.state["collected_data"] = self.conversation_manager.collected_data
+            print(f"   ✓ Captured: duration_since_onset = {answer_lower}")
+        elif "similar" in last_agent_msg and "before" in last_agent_msg:
+            self.conversation_manager.update_collected_data({"previous_injuries": answer_lower})
+            self.state["collected_data"] = self.conversation_manager.collected_data
+            print(f"   ✓ Captured: previous_injuries = {answer_lower}")
+        elif "training experience" in last_agent_msg or "how long" in last_agent_msg and "training" in last_agent_msg:
+            self.conversation_manager.update_collected_data({"training_experience": answer_lower})
+            self.state["collected_data"] = self.conversation_manager.collected_data
+            print(f"   ✓ Captured: training_experience = {answer_lower}")
+        elif "equipment" in last_agent_msg or "what equipment" in last_agent_msg:
+            self.conversation_manager.update_collected_data({"equipment": answer_lower})
+            self.state["collected_data"] = self.conversation_manager.collected_data
+            print(f"   ✓ Captured: equipment = {answer_lower}")
+        elif "sleep" in last_agent_msg:
+            self.conversation_manager.update_collected_data({"sleep_quality": answer_lower})
+            self.state["collected_data"] = self.conversation_manager.collected_data
+            print(f"   ✓ Captured: sleep_quality = {answer_lower}")
+        elif "hydrat" in last_agent_msg:
+            self.conversation_manager.update_collected_data({"hydration_level": answer_lower})
+            self.state["collected_data"] = self.conversation_manager.collected_data
+            print(f"   ✓ Captured: hydration_level = {answer_lower}")
+        elif "how often" in last_agent_msg or "training frequency" in last_agent_msg:
+            self.conversation_manager.update_collected_data({"training_frequency": answer_lower})
+            self.state["collected_data"] = self.conversation_manager.collected_data
+            print(f"   ✓ Captured: training_frequency = {answer_lower}")
+        elif "other symptoms" in last_agent_msg or "associated symptoms" in last_agent_msg:
+            self.conversation_manager.update_collected_data({"associated_symptoms": answer_lower})
+            self.state["collected_data"] = self.conversation_manager.collected_data
+            print(f"   ✓ Captured: associated_symptoms = {answer_lower}")
+        elif "tried" in last_agent_msg and "treat" in last_agent_msg:
+            self.conversation_manager.update_collected_data({"self_treatment_actions": answer_lower})
+            self.state["collected_data"] = self.conversation_manager.collected_data
+            print(f"   ✓ Captured: self_treatment_actions = {answer_lower}")
+        else:
+            print(f"   ⚠️ No field mapping found for question: {last_agent_msg[:50]}")
