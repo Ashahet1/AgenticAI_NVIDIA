@@ -19,7 +19,7 @@ active_conversations = {}
 
 @app.route('/')
 def serve_frontend():
-    return send_from_directory(app.static_folder, 'frontend_locked_with_google.html')
+    return send_from_directory(app.static_folder, 'frontend.html')
 
 
 @app.route('/<path:path>')
@@ -104,6 +104,14 @@ def chat():
         
         elif response_type == "complete":
             final_result = result.get("result", {})
+            # ADD THIS DEBUG:
+            print(f"DEBUG - Agents executed: {final_result.get('agents_executed', [])}")
+            # Debug: Check if references exist
+            # Debug: Check if references exist
+            print(f"DEBUG - Final result keys: {final_result.keys()}")
+            print(f"DEBUG - Web results: {len(final_result.get('web_results', []))}")
+            print(f"DEBUG - Web sources: {len(final_result.get('web_sources', []))}")
+                      
             
             return jsonify({
                 "ok": True,
