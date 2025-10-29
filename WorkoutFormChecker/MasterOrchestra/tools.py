@@ -1,112 +1,104 @@
+# simple_extractor.py
+# Simple regex-based extraction BEFORE running ParsingAgent
 
-import requests
-import os
-from dotenv import load_dotenv
+import re
 
-load_dotenv('/content/drive/MyDrive/WorkoutFormChecker/.env')
-
-class WebSearchTool:
+class SimpleExtractor:
     """
-    Web Search Tool - Uses Brave Search API for REAL web search
+    Extract obvious information from user message using simple patterns
+    This runs BEFORE ParsingAgent to catch 90% of cases
     """
     
     def __init__(self):
-        self.name = "WebSearchTool"
-        self.api_key = os.getenv("BRAVE_API_KEY", "")
+        # Common exercises
+        self.exercises = [
+            'squat', 'squats', 'deadlift', 'deadlifts', 'bench press', 'bench',
+            'overhead press', 'ohp', 'pull up', 'pullup', 'pull-up', 'pullups',
+            'chin up', 'chinup', 'chin-up', 'chinups', 'row', 'rows', 'barbell row',
+            'lunge', 'lunges', 'leg press', 'leg curl', 'leg extension',
+            'plank', 'push up', 'pushup', 'push-up', 'pushups',
+            'bicep curl', 'biceps curl', 'tricep extension', 'lat pulldown',
+            'dip', 'dips', 'clean', 'snatch', 'running', 'jogging', 'sprinting'
+        ]
         
-    def search(self, query, num_results=3):
+        # Body parts
+        self.body_parts = {
+            'knee': 'knee', 'knees': 'knee',
+            'shoulder': 'shoulder', 'shoulders': 'shoulder',
+            'back': 'back', 'lower back': 'lower back', 'upper back': 'upper back',
+            'elbow': 'elbow', 'elbows': 'elbow',
+            'wrist': 'wrist', 'wrists': 'wrist',
+            'hip': 'hip', 'hips': 'hip',
+            'ankle': 'ankle', 'ankles': 'ankle',
+            'neck': 'neck',
+            'chest': 'chest',
+            'hamstring': 'hamstring', 'hamstrings': 'hamstring',
+            'quad': 'quadriceps', 'quads': 'quadriceps', 'quadriceps': 'quadriceps',
+            'calf': 'calf', 'calves': 'calf',
+            'glute': 'glute', 'glutes': 'glute'
+        }
+        
+        # Timing patterns
+        self.timing_patterns = {
+            'during': ['during', 'while', 'when', 'as i'],
+            'after': ['after', 'following', 'post', 'later', 'next day', 'day after'],
+            'before': ['before', 'prior to']
+        }
+    
+    def extract(self, text):
         """
-        Search the web and return REAL results from Brave Search
-        
-        Args:
-            query: Search query string
-            num_results: Number of results to return
-            
-        Returns:
-            List of dicts with title, snippet, url
+        Extract exercise, pain_location, pain_timing from text
+        Returns dict with extracted fields (or "unknown" if not found)
         """
-        if not self.api_key:
-            print("❌ ERROR: No Brave API key found!")
-            return [{
-                'title': 'Configuration Error',
-                'snippet': 'Brave API key not configured. Web search unavailable.',
-                'url': ''
-            }]
+        text_lower = text.lower()
         
-        try:
-            url = "https://api.search.brave.com/res/v1/web/search"
-            headers = {
-                "Accept": "application/json",
-                "X-Subscription-Token": self.api_key
-            }
-            params = {
-                "q": query,
-                "count": num_results
-            }
-            
-            print(f"🔍 Calling Brave Search API for: '{query}'")
-            response = requests.get(url, headers=headers, params=params, timeout=10)
-            
-            if response.status_code == 200:
-                data = response.json()
-                results = []
-                
-                # Extract web results
-                web_results = data.get('web', {}).get('results', [])
-                
-                for item in web_results[:num_results]:
-                    results.append({
-                        'title': item.get('title', 'No title'),
-                        'snippet': item.get('description', 'No description'),
-                        'url': item.get('url', '')
-                    })
-                
-                if results:
-                    print(f"✅ Found {len(results)} real results from Brave Search")
-                    return results
-                else:
-                    print("⚠️ No results found for this query")
-                    return [{
-                        'title': 'No Results Found',
-                        'snippet': f'No web results found for: {query}. Try different search terms.',
-                        'url': ''
-                    }]
-                    
-            elif response.status_code == 401:
-                print("❌ ERROR: Invalid Brave API key")
-                return [{
-                    'title': 'Authentication Error',
-                    'snippet': 'Invalid or expired Brave API key.',
-                    'url': ''
-                }]
-            elif response.status_code == 429:
-                print("⚠️ Rate limit exceeded")
-                return [{
-                    'title': 'Rate Limit Exceeded',
-                    'snippet': 'Too many requests. Please try again later.',
-                    'url': ''
-                }]
-            else:
-                print(f"❌ Brave API error: {response.status_code}")
-                return [{
-                    'title': 'API Error',
-                    'snippet': f'Web search failed with status code: {response.status_code}',
-                    'url': ''
-                }]
-                
-        except requests.exceptions.Timeout:
-            print("⚠️ Web search timed out")
-            return [{
-                'title': 'Search Timeout',
-                'snippet': 'Web search request timed out. Please try again.',
-                'url': ''
-            }]
-        except Exception as e:
-            print(f"❌ Web search error: {str(e)}")
-            return [{
-                'title': 'Search Error',
-                'snippet': f'An error occurred during web search: {str(e)}',
-                'url': ''
-            }]
-
-print("✅ WebSearchTool created (REAL search only, no fake fallback)!")
+        result = {
+            'exercise': 'unknown',
+            'pain_location': 'unknown',
+            'pain_timing': 'unknown',
+            'pain_side': 'unknown'
+        }
+        
+        # Extract exercise
+        for exercise in self.exercises:
+            if exercise in text_lower:
+                result['exercise'] = exercise
+                print(f"   [SimpleExtractor] Found exercise: {exercise}")
+                break
+        
+        # Extract pain location
+        for body_part, normalized in self.body_parts.items():
+            if body_part in text_lower:
+                result['pain_location'] = normalized
+                print(f"   [SimpleExtractor] Found pain location: {normalized}")
+                break
+        
+        # Extract side (left/right)
+        if 'right' in text_lower:
+            result['pain_side'] = 'right'
+            result['pain_location'] = f"right {result['pain_location']}"
+            print(f"   [SimpleExtractor] Found side: right")
+        elif 'left' in text_lower:
+            result['pain_side'] = 'left'
+            result['pain_location'] = f"left {result['pain_location']}"
+            print(f"   [SimpleExtractor] Found side: left")
+        
+        # Extract timing
+        for timing_key, patterns in self.timing_patterns.items():
+            for pattern in patterns:
+                if pattern in text_lower:
+                    # Get more context
+                    if 'bottom' in text_lower or 'descent' in text_lower or 'lowering' in text_lower or 'coming up' in text_lower:
+                        result['pain_timing'] = f"during movement (specific phase)"
+                    elif timing_key == 'during':
+                        result['pain_timing'] = 'during the movement'
+                    elif timing_key == 'after':
+                        result['pain_timing'] = 'after the workout'
+                    else:
+                        result['pain_timing'] = timing_key
+                    print(f"   [SimpleExtractor] Found timing: {result['pain_timing']}")
+                    break
+            if result['pain_timing'] != 'unknown':
+                break
+        
+        return result
