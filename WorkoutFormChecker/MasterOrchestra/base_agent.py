@@ -23,14 +23,19 @@ class BaseAgent:
         """Call LLM with agent's context"""
         system_prompt = f"You are {self.name}, specialized in {self.role}. Be concise and specific."
         
-        full_prompt = f"{system_prompt}\n\n{prompt}"
+        messages = [
+            {"role": "system", "content": "detailed thinking on"},
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt}
+        ]
         
         response = self.client.chat.completions.create(
             model="nvidia/llama-3.1-nemotron-nano-8b-v1",
-            messages=[{"role": "user", "content": full_prompt}],
+            messages=messages,
             temperature=0.7,
             max_tokens=max_tokens,
-            stream=False
+            stream=False,
+            reasoning={"enabled": True}  # turn on reasoning mode
         )
         return response.choices[0].message.content
     
