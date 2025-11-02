@@ -138,10 +138,37 @@ WorkoutFormChecker/
 
 ## ⚙️ Installation & Setup
 
-### 1️⃣ Clone or copy the repo
+### 1. Clone or copy the repo
 ```bash
 git clone https://github.com/Ashahet1/AgenticAI_NVIDIA/WorkoutFormChecker.git
 cd WorkoutFormChecker/MasterOrchestra
 ```
-
-
+### 2. Install dependencies
+```
+pip install -r requirements.txt
+```
+### 3. Create .env (In Root Directory w/o creating Key's will not work code has EKS endpoint which is now deleted) 
+```
+NVIDIA_API_KEY="<YOUR_NVIDIA_KEY>"
+RETRIEVER_KEY="<YOUR_RETRIEVER_KEY"
+BRAVE_API_KEY="<YOUR_BRAVE_KEY>"
+NGROK_AUTH_TOKEN="<YOUR_NGROK_KEY"
+```
+### 3. Run the Flask backend (Make Sure you are in MasterOrchestra folder)
+```
+python3 server.py --port=5001
+```
+### 4. Check the port is Running
+```
+lsof -i :5001
+```
+### 5. Check NGROK tunnerl is running then check backend URL is live.
+```
+from pyngrok import ngrok
+backend_url = ngrok.connect(5001)
+print("NEW Backend URL:", backend_url.public_url)
+```
+### 5. Click on Backend URL that was generated
+```
+NEW Backend URL: https://rebeca-groutiest-incorporeally.ngrok-free.dev
+```
