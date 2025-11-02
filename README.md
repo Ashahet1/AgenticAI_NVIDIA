@@ -3,7 +3,7 @@
 > **Smart multi-agent system** that analyzes workout-related pain or discomfort, diagnoses likely form or injury issues, and provides a personalized action plan — all powered by reasoning agents.
 
 ---
-[![Live Demo](https://img.shields.io/badge/🌐%20Live%20Demo-Click%20Here-blueviolet?style=for-the-badge)](https://rebeca-groutiest-incorporeally.ngrok-free.dev/)
+[![Deployed Demo](https://img.shields.io/badge/▶️%20Watch%20on%20YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/zkjH1cTPuBI)
 ---
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1BhrEQneXIRvGKZxGQxZ4dNuq2j8WfLJC#scrollTo=uqm4g9hOZTgw)
