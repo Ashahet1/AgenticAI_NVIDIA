@@ -8,62 +8,101 @@
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1BhrEQneXIRvGKZxGQxZ4dNuq2j8WfLJC#scrollTo=uqm4g9hOZTgw)
 
-## 🚀 Motivation
+## Motivation
 
-Every athlete or fitness enthusiast has faced it —  
-> “My lower back hurts after deadlifts,”  
-> “I feel shoulder pain during bench press,”  
-> “Why does my stomach hurt when I do crunches?”
+Athletes and fitness enthusiasts often experience pain or discomfort during exercises and struggle to identify the cause. For instance:
 
-Most people guess the cause. Some Google it. Few get expert guidance.
+> "My knee hurts after squats."  
+> "My shoulder clicks during overhead press."  
+> "Should I continue training or rest?"
 
-This project bridges that gap — using **AI agents** that simulate how a sports medicine professional would think:
-- Parse your workout and symptoms.
-- Analyze likely form errors.
-- Diagnose potential issues.
-- Back findings with real research.
-- Recommend an action plan to recover safely.
+Most users rely on unverified online sources, leading to confusion and inconsistent advice. **Workout InjuryIntel** addresses this gap using an **AI-driven, multi-agent system** that emulates clinical reasoning and biomechanics expertise.
 
-The goal is **real-time, evidence-based feedback** that keeps training both **safe** and **effective**.
+The goal is to deliver **real-time, evidence-based recommendations** that combine natural language understanding, movement analysis, and medical knowledge retrieval — helping users train safely while minimizing injury risk.
 
 ---
 
-## 🧠 Multi-Agent Architecture
+## System Overview
 
-The system follows a structured reasoning pipeline through **five specialized agents**, orchestrated by `MasterOrchestrator`:
+Workout InjuryIntel operates as a **multi-agent reasoning system** designed to simulate how a sports medicine expert evaluates exercise-related pain.  
+The system integrates several specialized agents that collaborate under a central orchestration module called the **Master Orchestrator**.
 
-| Step | Agent | Role |
-|------|--------|------|
-| 🧩 1 | **ParsingAgent** | Extracts exercise, pain location, timing, and intensity from natural language. |
-| 🏋️ 2 | **FormAnalysisAgent** | Evaluates biomechanical issues (form breakdown, overuse, instability). |
-| 🩺 3 | **InjuryDiagnosisAgent** | Uses reasoning to identify the most likely injury and confidence level. |
-| 🔬 4 | **ResearchAgent** | Searches the web for scientific or medical support for the diagnosis. |
-| 📋 5 | **PrescriptionAgent** | Creates a week-long action plan with do/don’t recommendations and professional referral notes. |
+Each agent performs a specific task in a structured sequence that mirrors professional diagnostic reasoning — from symptom parsing to prescription planning.
 
-Each agent is modular and can be independently upgraded or replaced for fine-tuning or specialization.
+### Multi-Agent Pipeline
+
+| Step | Agent | Description |
+|------|--------|-------------|
+| 1 | **ParsingAgent** | Extracts exercise type, pain location, side, and timing from natural-language input. |
+| 2 | **FormAnalysisAgent** | Analyzes biomechanical movements to identify likely form deviations or muscle imbalances. |
+| 3 | **InjuryDiagnosisAgent** | Uses contextual reasoning to hypothesize the most probable injury and estimate confidence level. |
+| 4 | **ResearchAgent** | Queries the knowledge base and scientific literature using retrieval embeddings to validate findings. |
+| 5 | **PrescriptionAgent** | Generates a customized recovery plan with progressive exercises, red flags, and referral recommendations. |
+
+### Master Orchestrator
+
+The **Master Orchestrator** serves as the control layer.  
+It manages the flow of data between agents, interprets LLM outputs, and determines execution order based on system confidence and user input completeness.
+
+This orchestration includes:
+- A **PlannerAgent**, which dynamically decides which module to execute next.
+- A **ConversationManager**, which gathers missing context by asking relevant follow-up questions.
+- A **ReasoningController**, which enforces a “reason → reflect → retry” loop for consistent inference quality.
 
 ---
 
-## ✨ Features
+## Features and Capabilities
 
-- 🧠 **Multi-agent orchestration** with structured reasoning flow.
-- 🔍 **Dynamic symptom parsing** — understands free-text natural language inputs.
-- 🩹 **Evidence-backed diagnosis** using live research queries.
-- 💪 **Personalized recovery plan** generation.
-- 🌐 **Web UI integration** — interactive frontend with progress animation.
-- ⚡ **Flask backend** with `/run` endpoint for analysis orchestration.
-- 🔄 **CORS-enabled** for direct connection via ngrok or local frontend.
+Workout InjuryIntel integrates advanced reasoning and retrieval mechanisms to provide structured, medically aligned insights for workout-related pain and injury analysis.  
+Its core features emphasize modularity, explainability, and real-world applicability.
+
+### Key Features
+
+**1. Multi-Agent Orchestration**  
+Implements a sequence of specialized agents managed by the `MasterOrchestrator`. Each agent performs a unique reasoning step, enabling human-like contextual flow between analysis stages.
+
+**2. Conversational Understanding**  
+Uses a dynamic `ConversationManager` that identifies missing information and automatically asks follow-up questions in natural language, ensuring minimal user input fatigue.
+
+**3. Planner-Driven Reasoning Control**  
+A `PlannerAgent` governs workflow by evaluating each agent’s output and confidence level, skipping redundant modules when sufficient context exists. This minimizes unnecessary LLM calls and improves efficiency.
+
+**4. Integrated Retrieval and Knowledge Tools**  
+Combines a local `KnowledgeBaseTool` (pre-indexed PDFs and biomechanical reports) with a `WebSearchTool` that performs controlled, context-aware external lookups to supplement reasoning.
+
+**5. Structured Evidence Generation**  
+The `ResearchAgent` validates inferences through retrieval embeddings, referencing relevant literature or clinical studies. This enforces traceable, evidence-based recommendations.
+
+**6. Personalized Action Planning**  
+The `PrescriptionAgent` creates a tailored 7-day training and recovery plan based on the diagnosed condition, severity indicators, and biomechanical causes.
+
+**7. Modular Extensibility**  
+Each agent is independently replaceable and can be upgraded with different models, retrievers, or medical datasets without disrupting the orchestration logic.
+
+**8. Web UI Integration**  
+A lightweight, interactive frontend (HTML + JavaScript) connects directly to the Flask backend, displaying stepwise reasoning updates and recommendations in real time.
+
 ---
 
-## 🧰 Tech Stack
+## Technical Architecture and Stack
 
-| Layer | Technology |
-|-------|-------------|
-| Frontend | HTML, CSS (Inter font, light/dark mode), Vanilla JS |
-| Backend | Python (Flask + Flask-CORS) |
-| Agents | Custom Python modules orchestrated via `MasterOrchestrator` |
-| AI Model | LLM (**llama-3.1-nemotron-nano-8B-v1** in reasoning mode, deployed as an **NVIDIA NIM** microservice with at least one **Retrieval Embedding NIM |
-| Hosting | Amazon Sagemaker|
+Workout InjuryIntel is built on a modular.
+The platform combines containerized AI agents, reasoning orchestration, and retrieval-based knowledge systems.
+
+
+### Deployment and Runtime
+
+| Component | Platform / Technology | Purpose |
+|------------|-----------------------|----------|
+| **Model Runtime** | NVIDIA NIM (Llama-3.1-Nemotron-Nano-8B-v1) | High-performance reasoning engine hosted in an isolated inference container. |
+| **Container Management** | AWS Elastic Kubernetes Service (EKS) | Deploys multi-agent microservices and manages scaling, health checks, and rolling updates. |
+| **Backend Service** | Flask (Python) | Exposes REST endpoints (`/chat`, `/health`) for the Web UI and handles request routing. |
+| **Frontend** | HTML + JavaScript | Provides an interactive user interface for input, progress display, and AI recommendations. |
+| **Retrieval Mechanism** | NVIDIA Embedding API (`nv-embedqa-e5-v5`) | Enables vector search across biomechanical PDFs and research materials. |
+| **Knowledge Index** | FAISS-based local index + ResearchAgent | Manages document embeddings for fast evidence retrieval. |
+| **Storage and Logs** | AWS S3 + CloudWatch | Persists artifacts, model responses, and structured action plans. |
+| **Networking** | API Gateway + HTTPS ingress | Routes web traffic securely to the orchestrator and agents. |
+
 
 ---
 
@@ -73,20 +112,24 @@ Each agent is modular and can be independently upgraded or replaced for fine-tun
 WorkoutFormChecker/
 │
 ├── MasterOrchestra/
-│   ├── server.py                   # 🌐 Flask backend exposing /run endpoint
-│   ├── master.py                   # 🧠 Agentic Orchestrator with integrated ReasoningController
-│   │                                # (Reason → Reflect → Retry loop with confidence feedback)
-│   ├── base_agent.py               # 🧩 Base agent class with logging and safe execution
-│   ├── parsing_agent.py            # 🧾 Step 1 - Parse workout input and reasoning fields
-│   ├── form_analysis_agent.py      # 🏋️ Step 2 - Analyze biomechanics and detect form issues
-│   ├── injury_diagnosis_agent.py   # 🩺 Step 3 - Diagnose probable injury and root cause
-│   ├── research_agent.py           # 🔍 Step 4 - Retrieve supporting biomechanical/medical evidence
-│   ├── prescription_agent.py       # 📋 Step 5 - Generate personalized recovery & prevention plan
+│   ├── base_agent.py              # Base class for all agents with shared LLM call interface
+│   ├── conversation_manager.py    # Manages dialogue context and clarification questions
+│   ├── planner_agent.py           # Decides next agent to execute based on reasoning flow
+│   ├── parsing_agent.py           # Extracts exercise, pain details, and timing
+│   ├── form_analysis_agent.py     # Evaluates movement form and biomechanical stress points
+│   ├── injury_diagnosis_agent.py  # Infers probable injury and confidence score
+│   ├── research_agent.py          # Retrieves relevant biomechanical or clinical studies
+│   ├── prescription_agent.py      # Generates actionable weekly recovery and prevention plan
+│   ├── master.py                  # Core orchestrator that coordinates agent interactions
+│   ├── server.py                  # Flask-based backend exposing REST endpoints
+│   ├── tools/                     # Utility scripts (e.g., KnowledgeBaseTool, WebSearchTool)
+│   ├── knowledge_base/            # Local indexed PDFs and embeddings for retrieval
+│   ├── logs/                      # Optional logging directory for request tracking
+│   └── requirements.txt           # Python dependencies
 │
-├── frontend.html                   # 💻 Interactive web UI with animated reasoning progress
-├── requirements.txt                # 📦 Flask, Flask-CORS, and dependencies
-└── README.md                       # 🧭 Project overview and setup instructions
-
+├── frontend.html                  # Lightweight HTML+JS UI for user interaction
+├── Images/                        # Architecture diagrams and UI screenshots
+└── README.md                      # Project documentation and setup guide
 ```
 ---
 ## Architecture Diagram
