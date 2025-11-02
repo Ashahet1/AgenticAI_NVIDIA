@@ -1,3 +1,5 @@
+# injury_diagnosis_agent.py
+
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -5,22 +7,14 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from base_agent import BaseAgent
 
 class InjuryDiagnosisAgent(BaseAgent):
-    """Diagnoses injury patterns and identifies root causes"""
-    
     def __init__(self):
-        super().__init__(
-            name="InjuryDiagnosisAgent",
-            role="diagnosing injury patterns and determining root causes"
-        )
+        super().__init__(name="InjuryDiagnosisAgent", role="diagnosing injuries")
     
-    def execute(self, parsed_data, form_analysis):
-        """Diagnose injury based on symptoms and form analysis"""
-        
-        exercise = parsed_data.get("exercise", "unknown")
-        pain_location = parsed_data.get("pain_location", "unspecified")
-        pain_timing = parsed_data.get("pain_timing", "unspecified")
-        pain_intensity = parsed_data.get("pain_intensity", "unspecified")
-        
+    def execute(self, collected_data, form_analysis):
+        exercise = collected_data.get("exercise", "unknown")
+        pain_location = collected_data.get("pain_location", "unspecified")
+        pain_timing = collected_data.get("pain_timing", "unspecified")
+        pain_intensity = collected_data.get("pain_intensity", "unspecified")
         form_issues = form_analysis.get("form_analysis", "No form analysis available")
         
         prompt = f"""
@@ -50,27 +44,19 @@ Provide the following structured output:
 
 Keep it under 220 words, using clear and professional tone (as if writing a quick note in a sports injury evaluation record).
 
-IMPORTANT: Do not use any markdown formatting such as ** for bold or * for italics. Use plain text only with clear section labels.
+IMPORTANT: Do not use any markdown formatting such as ** for bold or * for italics.Don't include meta comments in final plan.
 """
-
         
-        response = self.call_llm(prompt, max_tokens=500)
-        
-        # Remove any remaining ** markdown formatting as a safety measure
-        response = response.replace('**', '')
-        
-        confidence = "medium"
-        if "high confidence" in response.lower() or "likely" in response.lower():
-            confidence = "high"
-        elif "low confidence" in response.lower() or "unclear" in response.lower():
-            confidence = "low"
-        
-        self.log_action("diagnose_injury", response)
-        
-        return {
-            "agent": self.name,
-            "diagnosis": response,
-            "confidence": confidence,
-            "requires_medical_attention": "red flag" in response.lower() or "see a doctor" in response.lower(),
-            "status": "success"
-        }
+        try:
+            response = self.call_llm(prompt, max_tokens=200)
+            return {
+                "agent": self.name,
+                "diagnosis": response,
+                "status": "success"
+            }
+        except Exception as e:
+            return {
+                "agent": self.name,
+                "diagnosis": f"Diagnosis unavailable: {str(e)}",
+                "status": "error"
+            }

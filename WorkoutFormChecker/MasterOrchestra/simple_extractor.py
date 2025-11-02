@@ -1,7 +1,12 @@
 # simple_extractor.py
 # Simple regex-based extraction BEFORE running ParsingAgent
 
+import logging
 import re
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class SimpleExtractor:
     """
@@ -63,26 +68,26 @@ class SimpleExtractor:
         for exercise in self.exercises:
             if exercise in text_lower:
                 result['exercise'] = exercise
-                print(f"   [SimpleExtractor] Found exercise: {exercise}")
+                logger.info(f"[SimpleExtractor] Found exercise: {exercise}")
                 break
         
         # Extract pain location
         for body_part, normalized in self.body_parts.items():
             if body_part in text_lower:
                 result['pain_location'] = normalized
-                print(f"   [SimpleExtractor] Found pain location: {normalized}")
+                logger.info(f"[SimpleExtractor] Found pain location: {normalized}")
                 break
         
         # Extract side (left/right)
         if 'right' in text_lower:
             result['pain_side'] = 'right'
             result['pain_location'] = f"right {result['pain_location']}"
-            print(f"   [SimpleExtractor] Found side: right")
+            logger.info(f"[SimpleExtractor] Found side: right")
         elif 'left' in text_lower:
             result['pain_side'] = 'left'
             result['pain_location'] = f"left {result['pain_location']}"
-            print(f"   [SimpleExtractor] Found side: left")
-        
+            logger.info(f"[SimpleExtractor] Found side: left")
+
         # Extract timing
         for timing_key, patterns in self.timing_patterns.items():
             for pattern in patterns:
@@ -96,7 +101,7 @@ class SimpleExtractor:
                         result['pain_timing'] = 'after the workout'
                     else:
                         result['pain_timing'] = timing_key
-                    print(f"   [SimpleExtractor] Found timing: {result['pain_timing']}")
+                    logger.info(f"[SimpleExtractor] Found timing: {result['pain_timing']}")
                     break
             if result['pain_timing'] != 'unknown':
                 break

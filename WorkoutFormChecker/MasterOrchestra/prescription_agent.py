@@ -19,7 +19,7 @@ class PrescriptionAgent(BaseAgent):
         form_issues = form_analysis.get("form_analysis", "")
         web_results = research.get("web_results", [])
         
-        prompt = f"""Create action plan (NO markdown ** symbols):
+        prompt = f"""Create action plan (NO markdown ** symbols). Don't include meta comments in final plan:
 
 DIAGNOSIS: {diagnosis_text}
 FORM: {form_issues}

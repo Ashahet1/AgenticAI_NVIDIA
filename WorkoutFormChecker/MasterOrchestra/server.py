@@ -215,6 +215,6 @@ if __name__ == '__main__':
     print("   POST /chat/reset        - Reset conversation")
     print("   GET  /health            - Health check")
     print("="*70)
-    print("\nServer starting on http://0.0.0.0:5000\n")
+    print("\nServer starting on http://0.0.0.0:5001\n")
     
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=True)

@@ -3,15 +3,14 @@ from openai import OpenAI
 import requests
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
 from base_agent import BaseAgent
-from tools import WebSearchTool
+from tools import WebSearchTool, KnowledgeBaseTool
+
 import fitz  # PyMuPDF
 import json
 import boto3
 import numpy as np
-
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 class ResearchAgent(BaseAgent):
     """
@@ -248,6 +247,17 @@ IMPORTANT: Do not use any markdown formatting such as ** for bold or * for itali
             "results": len(web_results)
         })
         
+        # 🧠 Summarize key findings (adds research_findings to the result)
+        try:
+            urls_text = "\n".join([r['url'] for r in web_results if r.get('url')])
+            findings_summary = self.call_llm(
+                f"Summarize the rehabilitation or treatment insights from these sources in 120 words:\n{urls_text}",
+                max_tokens=250
+            )
+        except Exception as e:
+            print(f"⚠️ Could not summarize research findings: {e}")
+            findings_summary = "N/A"
+
         return {
             "agent": self.name,
             "tool_used": "web_search",
@@ -255,6 +265,7 @@ IMPORTANT: Do not use any markdown formatting such as ** for bold or * for itali
             "kb_results": [],
             "web_results": web_results,
             "synthesis": synthesis,
+            "findings": findings_summary,   # 👈 NEW FIELD HERE
             "sources": [r['url'] for r in web_results if r.get('url')],
             "status": "success"
         }
@@ -338,8 +349,7 @@ Keep under 150 words. Use plain text, no markdown formatting.
         prompt = f"""
 Synthesize evidence from both internal protocols and latest web research.
 
-DIAGNOSIS:
-{diagnosis.get('diagnosis', 'N/A')}
+
 
 INTERNAL PROTOCOLS (Knowledge Base):
 {kb_content}
