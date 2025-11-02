@@ -147,7 +147,7 @@ cd WorkoutFormChecker/MasterOrchestra
 ```
 pip install -r requirements.txt
 ```
-### 3. Create .env (In Root Directory w/o creating Key's will not work code has EKS endpoint which is now deleted) 
+### 3. Create .env (In Root Directory w/o creating Key's will not work code as EKS endpoint which is now deleted) 
 ```
 NVIDIA_API_KEY="<YOUR_NVIDIA_KEY>"
 RETRIEVER_KEY="<YOUR_RETRIEVER_KEY"
